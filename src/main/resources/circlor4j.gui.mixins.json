@@ -1,0 +1,22 @@
+{
+	"required": true,
+	"package": "dev1503.circlor4j.client.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"MinecraftClientMixin",
+		"KeyboardHandlerMixin",
+		"LightmapRenderStateExtractorMixin",
+		"LocalPlayerMixin",
+		"CameraMixin",
+		"ClientInputMixin",
+		"EntityMixin",
+		"KeyboardInputMixin",
+		"LivingEntityMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}
