@@ -35,7 +35,7 @@ public abstract class MultiPlayerGameModeMixin {
 		}
 		Minecraft mc = Minecraft.getInstance();
 		LocalPlayer localPlayer = mc.player;
-		if (localPlayer == null || !localPlayer.onGround() || localPlayer.isInWater() || localPlayer.isInLava()) {
+		if (localPlayer == null || localPlayer.isInWater() || localPlayer.isInLava()) {
 			return;
 		}
 		ClientPacketListener connection = mc.getConnection();

@@ -46,6 +46,12 @@ public final class TracerRenderer {
 		int screenHeight = mc.getWindow().getGuiScaledHeight();
 		float cx = screenWidth / 2.0F;
 		float cy = screenHeight / 2.0F;
+		int anchor = TracerModule.getAnchor();
+		if (anchor == 0) {
+			cy = 0.0F;
+		} else if (anchor == 2) {
+			cy = screenHeight;
+		}
 		float thickness = TracerModule.getThickness();
 
 		for (Entity entity : level.entitiesForRendering()) {

@@ -3,8 +3,12 @@ package dev1503.circlor4j.client.mixin;
 import dev1503.circlor4j.client.module.modules.AirJumpModule;
 import dev1503.circlor4j.client.module.modules.FreecamModule;
 import dev1503.circlor4j.client.module.modules.FreelookModule;
+import dev1503.circlor4j.client.module.modules.HitboxModule;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -38,5 +42,31 @@ public abstract class EntityMixin {
 		if ((Object) this == Minecraft.getInstance().player && AirJumpModule.isActive()) {
 			cir.setReturnValue(true);
 		}
+	}
+
+	@Inject(method = "getPickRadius", at = @At("RETURN"), cancellable = true)
+	private void circlor4jHitbox(CallbackInfoReturnable<Float> cir) {
+		if (!HitboxModule.isActive()) {
+			return;
+		}
+		Entity entity = (Entity) (Object) this;
+		if (entity instanceof Player p && p.isLocalPlayer()) {
+			return;
+		}
+		double scale;
+		if (entity instanceof Player) {
+			scale = HitboxModule.getPlayersHorizon();
+		} else if (entity instanceof LivingEntity) {
+			scale = HitboxModule.getMobsHorizon();
+		} else {
+			return;
+		}
+		if (scale <= 1.0) {
+			return;
+		}
+		float base = cir.getReturnValue();
+		float width = entity.getBbWidth();
+		float expand = (width / 2.0F) * (float)(scale - 1.0);
+		cir.setReturnValue(base + expand);
 	}
 }

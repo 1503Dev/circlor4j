@@ -15,12 +15,23 @@ public class TracerModule extends Module {
 	private static final String PLAYERS = "players";
 	private static final String ITEMS = "items";
 	private static final String THICKNESS = "thickness";
+	private static final String ANCHOR = "anchor";
+	private static final int ANCHOR_TOP = 0;
+	private static final int ANCHOR_CENTER = 1;
+	private static final int ANCHOR_BOTTOM = 2;
 
 	public static final int DEFAULT_COLOR = 0xFFFFFFFF;
 
 	public TracerModule(StatusManager status) {
 		super(status, ID, "Tracer", "Draws lines from the crosshair to entities", ModuleCategory.RENDER);
 		this.registerSlider(THICKNESS, "Thickness", 0.1, 3.0, 0.05, 0.3);
+		this.registerDropdown(
+			ANCHOR,
+			"Anchor",
+			new String[] {"Top", "Center", "Bottom"},
+			new String[] {"module.tracer.anchor.top.name", "module.tracer.anchor.center.name", "module.tracer.anchor.bottom.name"},
+			ANCHOR_CENTER
+		);
 		this.registerToggle(MOBS, "Mobs");
 		this.registerColor(MOBS, "Color", DEFAULT_COLOR);
 		this.registerToggle(PLAYERS, "Players", true);
@@ -64,5 +75,9 @@ public class TracerModule extends Module {
 
 	public static float getThickness() {
 		return (float) StatusManager.getInstance().getDouble(ID + "/" + THICKNESS, 1.0);
+	}
+
+	public static int getAnchor() {
+		return (int) StatusManager.getInstance().getDouble(ID + "/" + ANCHOR, ANCHOR_CENTER);
 	}
 }

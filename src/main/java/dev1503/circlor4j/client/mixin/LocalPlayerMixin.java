@@ -1,8 +1,8 @@
 package dev1503.circlor4j.client.mixin;
 
+import dev1503.circlor4j.client.module.modules.FastStopModule;
 import dev1503.circlor4j.client.module.modules.NoFallModule;
 import dev1503.circlor4j.client.module.modules.NoSlowDownModule;
-import dev1503.circlor4j.client.module.modules.FastStopModule;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.Vec2;
 import org.spongepowered.asm.mixin.Mixin;

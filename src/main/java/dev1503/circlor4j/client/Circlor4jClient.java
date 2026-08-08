@@ -17,6 +17,7 @@ import dev1503.circlor4j.client.module.modules.FullBrightModule;
 import dev1503.circlor4j.client.module.modules.FreecamModule;
 import dev1503.circlor4j.client.module.modules.FreelookModule;
 import dev1503.circlor4j.client.module.modules.FullBrightModule;
+import dev1503.circlor4j.client.module.modules.HitboxModule;
 import dev1503.circlor4j.client.module.modules.HighJumpModule;
 import dev1503.circlor4j.client.module.modules.InventoryMoveModule;
 import dev1503.circlor4j.client.module.modules.JetpackModule;
@@ -28,6 +29,7 @@ import dev1503.circlor4j.client.module.modules.NoSlowDownModule;
 import dev1503.circlor4j.client.module.modules.NoWebModule;
 import dev1503.circlor4j.client.module.modules.NukerModule;
 import dev1503.circlor4j.client.module.modules.ReachModule;
+import dev1503.circlor4j.client.module.modules.ScaffoldModule;
 import dev1503.circlor4j.client.module.modules.SpeedModule;
 import dev1503.circlor4j.client.module.modules.TracerModule;
 import dev1503.circlor4j.client.module.modules.TrueSightModule;
@@ -68,34 +70,36 @@ public final class Circlor4jClient {
 			}
 		});
 
-		ModuleManager.register(new AutoClickerModule(status));
+		ModuleManager.register(new ArraylistModule(status));
 		ModuleManager.register(new AirJumpModule(status));
 		ModuleManager.register(new AntiKnockbackModule(status));
-		ModuleManager.register(new ArraylistModule(status));
+		ModuleManager.register(new AutoClickerModule(status));
 		ModuleManager.register(new AutoSprintModule(status));
 		ModuleManager.register(new ClickGuiModule(status));
 		ModuleManager.register(new CriticalsModule(status));
 		ModuleManager.register(new CrystalAuraModule(status));
 		ModuleManager.register(new EspModule(status));
 		ModuleManager.register(new FastStopModule(status));
-		ModuleManager.register(new FullBrightModule(status));
 		ModuleManager.register(new FreecamModule(status));
 		ModuleManager.register(new FreelookModule(status));
+		ModuleManager.register(new FullBrightModule(status));
+		ModuleManager.register(new HitboxModule(status));
 		ModuleManager.register(new HighJumpModule(status));
+		ModuleManager.register(new InventoryMoveModule(status));
 		ModuleManager.register(new JetpackModule(status));
 		ModuleManager.register(new KillAuraModule(status));
+		ModuleManager.register(new LanguageModule(status));
 		ModuleManager.register(new NoCameraClipModule(status));
 		ModuleManager.register(new NoFallModule(status));
 		ModuleManager.register(new NoSlowDownModule(status));
 		ModuleManager.register(new NoWebModule(status));
 		ModuleManager.register(new NukerModule(status));
 		ModuleManager.register(new ReachModule(status));
-		ModuleManager.register(new LanguageModule(status));
+		ModuleManager.register(new ScaffoldModule(status));
 		ModuleManager.register(new SpeedModule(status));
 		ModuleManager.register(new TracerModule(status));
 		ModuleManager.register(new TrueSightModule(status));
 		ModuleManager.register(new ZoomModule(status));
-		ModuleManager.register(new InventoryMoveModule(status));
 
 		KeyBindManager.init();
 	}
