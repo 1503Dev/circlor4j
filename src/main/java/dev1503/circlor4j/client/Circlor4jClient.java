@@ -3,6 +3,7 @@ package dev1503.circlor4j.client;
 import dev1503.circlor4j.client.keybind.KeyBindManager;
 import dev1503.circlor4j.client.module.ModuleManager;
 import dev1503.circlor4j.client.module.modules.AutoClickerModule;
+import dev1503.circlor4j.client.module.modules.AimBotModule;
 import dev1503.circlor4j.client.module.modules.ArraylistModule;
 import dev1503.circlor4j.client.module.modules.AutoClickerModule;
 import dev1503.circlor4j.client.module.modules.AutoSprintModule;
@@ -72,6 +73,7 @@ public final class Circlor4jClient {
 
 		ModuleManager.register(new ArraylistModule(status));
 		ModuleManager.register(new AirJumpModule(status));
+		ModuleManager.register(new AimBotModule(status));
 		ModuleManager.register(new AntiKnockbackModule(status));
 		ModuleManager.register(new AutoClickerModule(status));
 		ModuleManager.register(new AutoSprintModule(status));

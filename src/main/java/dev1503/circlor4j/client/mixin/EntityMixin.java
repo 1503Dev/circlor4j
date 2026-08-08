@@ -1,5 +1,6 @@
 package dev1503.circlor4j.client.mixin;
 
+import dev1503.circlor4j.client.module.modules.AimBotModule;
 import dev1503.circlor4j.client.module.modules.AirJumpModule;
 import dev1503.circlor4j.client.module.modules.FreecamModule;
 import dev1503.circlor4j.client.module.modules.FreelookModule;
@@ -29,6 +30,8 @@ public abstract class EntityMixin {
 			ci.cancel();
 		} else if (FreecamModule.isActive()) {
 			FreecamModule.updateRotation(xo * 0.15, yo * 0.15);
+			ci.cancel();
+		} 		else if (AimBotModule.isActive() && AimBotModule.applyAim(xo, yo)) {
 			ci.cancel();
 		}
 	}
