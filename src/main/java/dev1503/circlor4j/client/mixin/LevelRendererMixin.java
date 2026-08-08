@@ -22,13 +22,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * Draws the ESP wireframe boxes. Injects into {@code LevelRenderer.submitFeatures} (the
- * entity/feature submit pass) and submits a {@link EspRenderType#LINES} shape outline for
- * each selected entity's interpolated collision box, translated to be camera-relative like
- * the vanilla block outline. The custom render type has depth testing disabled, so the boxes
- * are never occluded by terrain.
- */
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererMixin {
 
@@ -96,7 +89,6 @@ public abstract class LevelRendererMixin {
 		}
 	}
 
-	/** Moves the collision box by the entity's interpolated movement so it renders smoothly between ticks. */
 	private static AABB interpolatedBox(Entity entity, float partialTicks) {
 		Vec3 pos = entity.getPosition(partialTicks);
 		return entity.getBoundingBox().move(pos.x - entity.getX(), pos.y - entity.getY(), pos.z - entity.getZ());

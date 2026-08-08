@@ -99,7 +99,7 @@ public class KeyBind {
 		if (this.shift) {
 			sb.append("Shift+");
 		}
-		sb.append(this.key.getName());
+		sb.append(this.key.getDisplayName().getString());
 		return sb.toString();
 	}
 

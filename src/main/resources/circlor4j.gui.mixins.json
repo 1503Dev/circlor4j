@@ -5,13 +5,16 @@
 	"client": [
 		"MinecraftClientMixin",
 		"KeyboardHandlerMixin",
+		"KeyMappingAccessor",
 		"LightmapRenderStateExtractorMixin",
+		"LivingEntityRendererMixin",
 		"LocalPlayerMixin",
 		"CameraMixin",
 		"ClientInputMixin",
 		"EntityMixin",
 		"KeyboardInputMixin",
-		"LivingEntityMixin"
+		"LivingEntityMixin",
+		"WebBlockMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

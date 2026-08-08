@@ -12,7 +12,10 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 
@@ -39,6 +42,9 @@ public class KillAuraModule extends Module {
 	private static final String MOBS = "mobs";
 	private static final String FILTER_VILLAGER = "filter_villager";
 	private static final String FILTER_BABY = "filter_baby";
+	private static final String FILTER_PASSIVE = "filter_passive";
+	private static final String FILTER_NEUTRAL = "filter_neutral";
+	private static final String FILTER_HOSTILE = "filter_hostile";
 	private static final int MODE_AUTO_INTERVAL = 0;
 	private static final int MODE_FIXED_CPS = 1;
 
@@ -60,6 +66,9 @@ public class KillAuraModule extends Module {
 		this.registerToggle(MOBS, "Mobs");
 		this.registerToggleIn(MOBS, FILTER_VILLAGER, "FilterVillager");
 		this.registerToggleIn(MOBS, FILTER_BABY, "FilterBaby");
+		this.registerToggleIn(MOBS, FILTER_PASSIVE, "FilterPassive");
+		this.registerToggleIn(MOBS, FILTER_NEUTRAL, "FilterNeutral");
+		this.registerToggleIn(MOBS, FILTER_HOSTILE, "FilterHostile");
 	}
 
 	@Override
@@ -110,6 +119,9 @@ public class KillAuraModule extends Module {
 		}
 		boolean filterVillager = status.getBoolean(ID + "/" + MOBS + "/" + FILTER_VILLAGER + "/enabled", false);
 		boolean filterBaby = status.getBoolean(ID + "/" + MOBS + "/" + FILTER_BABY + "/enabled", false);
+		boolean filterPassive = status.getBoolean(ID + "/" + MOBS + "/" + FILTER_PASSIVE + "/enabled", false);
+		boolean filterNeutral = status.getBoolean(ID + "/" + MOBS + "/" + FILTER_NEUTRAL + "/enabled", false);
+		boolean filterHostile = status.getBoolean(ID + "/" + MOBS + "/" + FILTER_HOSTILE + "/enabled", false);
 
 		double maxReach = status.getDouble(ID + "/" + MAX_REACH, 3.0);
 		double reachLimit = player.getAttributeValue(Attributes.ENTITY_INTERACTION_RANGE);
@@ -133,12 +145,21 @@ public class KillAuraModule extends Module {
 				if (!mobsEnabled) {
 					continue;
 				}
-				if (filterVillager && entity instanceof AbstractVillager) {
-					continue;
-				}
-				if (filterBaby && living.isBaby()) {
-					continue;
-				}
+			if (filterVillager && entity instanceof AbstractVillager) {
+				continue;
+			}
+			if (filterBaby && living.isBaby()) {
+				continue;
+			}
+			if (filterPassive && entity instanceof Animal) {
+				continue;
+			}
+			if (filterNeutral && entity instanceof NeutralMob) {
+				continue;
+			}
+			if (filterHostile && entity instanceof Monster && !(entity instanceof NeutralMob)) {
+				continue;
+			}
 			}
 			if (player.distanceToSqr(entity) <= reachSq) {
 				targets.add(entity);
