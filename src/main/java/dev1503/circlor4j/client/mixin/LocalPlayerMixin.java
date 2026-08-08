@@ -51,7 +51,11 @@ public abstract class LocalPlayerMixin {
 			return;
 		}
 		LocalPlayer player = (LocalPlayer) (Object) this;
-		if (player.input.hasForwardImpulse()) {
+		if (player.isInWater() || player.isInLava()) {
+			return;
+		}
+		if (player.input.keyPresses.forward() || player.input.keyPresses.backward()
+			|| player.input.keyPresses.left() || player.input.keyPresses.right()) {
 			return;
 		}
 		player.setDeltaMovement(0.0, player.getDeltaMovement().y, 0.0);
