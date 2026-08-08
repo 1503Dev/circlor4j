@@ -34,6 +34,7 @@ import dev1503.circlor4j.client.module.modules.ScaffoldModule;
 import dev1503.circlor4j.client.module.modules.SpeedModule;
 import dev1503.circlor4j.client.module.modules.TracerModule;
 import dev1503.circlor4j.client.module.modules.TrueSightModule;
+import dev1503.circlor4j.client.module.modules.XrayModule;
 import dev1503.circlor4j.client.module.modules.ZoomModule;
 import dev1503.circlor4j.ui.StatusManager;
 import dev1503.circlor4j.ui.clickgui.ClickGuiScreen;
@@ -101,6 +102,7 @@ public final class Circlor4jClient {
 		ModuleManager.register(new SpeedModule(status));
 		ModuleManager.register(new TracerModule(status));
 		ModuleManager.register(new TrueSightModule(status));
+		ModuleManager.register(new XrayModule(status));
 		ModuleManager.register(new ZoomModule(status));
 
 		KeyBindManager.init();

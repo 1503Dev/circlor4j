@@ -55,6 +55,15 @@ public class FreecamModule extends Module {
 		rotYaw = rotPitch = lastYaw = lastPitch = 0.0F;
 	}
 
+	public static void disable() {
+		if (available) {
+			StatusManager.getInstance().setValue(ID + "/enabled", 0.0);
+			available = false;
+			pos = lastPos = Vec3.ZERO;
+			rotYaw = rotPitch = lastYaw = lastPitch = 0.0F;
+		}
+	}
+
 	@Override
 	public void onTick() {
 		Minecraft mc = Minecraft.getInstance();

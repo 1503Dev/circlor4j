@@ -39,4 +39,11 @@ public abstract class MinecraftClientMixin {
 			ci.cancel();
 		}
 	}
+
+	@Inject(method = "setLevel", at = @At("HEAD"))
+	private void circlor4jWorldChange(net.minecraft.client.multiplayer.ClientLevel level, CallbackInfo ci) {
+		if (FreecamModule.isActive()) {
+			FreecamModule.disable();
+		}
+	}
 }

@@ -2,8 +2,10 @@ package dev1503.circlor4j.client.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev1503.circlor4j.client.module.modules.EspModule;
+import dev1503.circlor4j.client.module.modules.XrayModule;
 import dev1503.circlor4j.client.render.EspRenderType;
 import dev1503.circlor4j.client.render.TracerRenderer;
+import dev1503.circlor4j.client.render.XrayRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -32,16 +34,28 @@ public abstract class LevelRendererMixin {
 		boolean renderOutline,
 		CallbackInfo ci
 	) {
-		TracerRenderer.capture(levelRenderState.cameraRenderState);
-		if (!EspModule.isActive()) {
-			return;
-		}
 		Minecraft minecraft = Minecraft.getInstance();
+		TracerRenderer.capture(levelRenderState.cameraRenderState);
 		ClientLevel level = minecraft.level;
-		Entity cameraEntity = minecraft.player;
 		if (level == null) {
 			return;
 		}
+
+		PoseStack poseStack = new PoseStack();
+		poseStack.translate(
+			-(float) levelRenderState.cameraRenderState.pos.x,
+			-(float) levelRenderState.cameraRenderState.pos.y,
+			-(float) levelRenderState.cameraRenderState.pos.z
+		);
+
+		if (XrayModule.isActive()) {
+			XrayRenderer.render(poseStack, submitNodeCollector, levelRenderState.cameraRenderState.pos);
+		}
+
+		if (!EspModule.isActive()) {
+			return;
+		}
+		Entity cameraEntity = minecraft.player;
 
 		boolean mobs = EspModule.isMobsEnabled();
 		boolean players = EspModule.isPlayersEnabled();
@@ -51,13 +65,6 @@ public abstract class LevelRendererMixin {
 		}
 
 		float partialTicks = minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(true);
-
-		PoseStack poseStack = new PoseStack();
-		poseStack.translate(
-			-(float) levelRenderState.cameraRenderState.pos.x,
-			-(float) levelRenderState.cameraRenderState.pos.y,
-			-(float) levelRenderState.cameraRenderState.pos.z
-		);
 
 		for (Entity entity : level.entitiesForRendering()) {
 			if (entity == cameraEntity) {
