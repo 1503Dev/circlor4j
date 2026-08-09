@@ -29,26 +29,47 @@ public final class XrayRenderer {
 		{0, 0, 1}, {0, 0, -1}
 	};
 
+	private record Outline(VoxelShape shape, int color) {
+	}
+
+	private static final List<Outline> cachedOutlines = new ArrayList<>();
+	private static int cachedVersion = -1;
+	private static int cachedCenterX;
+	private static int cachedCenterY;
+	private static int cachedCenterZ;
+	private static int cachedRadius;
+	private static int cachedVerticalRadius;
+
 	private XrayRenderer() {
 	}
 
-	public static void render(com.mojang.blaze3d.vertex.PoseStack poseStack,
-							  net.minecraft.client.renderer.SubmitNodeCollector collector,
-							  Vec3 cameraPos) {
-		Minecraft mc = Minecraft.getInstance();
-		if (mc.level == null || mc.player == null) {
-			return;
-		}
-		int radius = XrayModule.getRadius();
+	private static boolean isDirty(Minecraft mc, BlockPos center, int radius, int verticalRadius, int version) {
+		return cachedVersion != version
+			|| cachedRadius != radius
+			|| cachedVerticalRadius != verticalRadius
+			|| cachedCenterX != center.getX()
+			|| cachedCenterY != center.getY()
+			|| cachedCenterZ != center.getZ();
+	}
+
+	private static void rebuild(Minecraft mc, BlockPos center, int radius, int verticalRadius, int version) {
+		cachedOutlines.clear();
+		cachedVersion = version;
+		cachedRadius = radius;
+		cachedVerticalRadius = verticalRadius;
+		cachedCenterX = center.getX();
+		cachedCenterY = center.getY();
+		cachedCenterZ = center.getZ();
+
 		int chunkRadius = radius * 2 - 1;
 		int halfBlocks = (chunkRadius * 16) / 2;
-		BlockPos center = mc.player.blockPosition();
+		int halfVerticalBlocks = (verticalRadius * 16) / 2;
 		int minX = center.getX() - halfBlocks;
 		int maxX = center.getX() + halfBlocks;
 		int minZ = center.getZ() - halfBlocks;
 		int maxZ = center.getZ() + halfBlocks;
-		int minY = mc.level.getMinY();
-		int maxY = mc.level.getMaxY();
+		int minY = center.getY() - halfVerticalBlocks;
+		int maxY = center.getY() + halfVerticalBlocks;
 
 		LongSet orePositions = new LongOpenHashSet();
 		Map<Long, Block> positionToBlock = new HashMap<>();
@@ -57,6 +78,8 @@ public final class XrayRenderer {
 		int maxChunkX = SectionPos.blockToSectionCoord(maxX);
 		int minChunkZ = SectionPos.blockToSectionCoord(minZ);
 		int maxChunkZ = SectionPos.blockToSectionCoord(maxZ);
+		int minSectionY = minY >> 4;
+		int maxSectionY = maxY >> 4;
 
 		for (int cx = minChunkX; cx <= maxChunkX; cx++) {
 			for (int cz = minChunkZ; cz <= maxChunkZ; cz++) {
@@ -64,23 +87,30 @@ public final class XrayRenderer {
 				if (chunk == null) {
 					continue;
 				}
+				int baseX = chunk.getPos().getMinBlockX();
+				int baseZ = chunk.getPos().getMinBlockZ();
 				for (int si = 0; si < chunk.getSections().length; si++) {
+					int sectionY = mc.level.getSectionYFromSectionIndex(si);
+					if (sectionY < minSectionY || sectionY > maxSectionY) {
+						continue;
+					}
 					LevelChunkSection section = chunk.getSections()[si];
 					if (section == null || section.hasOnlyAir()) {
 						continue;
 					}
-					int baseY = mc.level.getSectionYFromSectionIndex(si) * 16;
-					int baseX = chunk.getPos().getMinBlockX();
-					int baseZ = chunk.getPos().getMinBlockZ();
-					for (int lx = 0; lx < 16; lx++) {
-						for (int lz = 0; lz < 16; lz++) {
-							for (int ly = 0; ly < 16; ly++) {
-								int wx = baseX + lx;
+					int baseY = sectionY * 16;
+					int lyStart = sectionY == minSectionY ? (minY & 15) : 0;
+					int lyEnd = sectionY == maxSectionY ? (maxY & 15) : 15;
+					int lxStart = (cx == minChunkX) ? (minX - baseX) : 0;
+					int lxEnd = (cx == maxChunkX) ? (maxX - baseX) : 15;
+					int lzStart = (cz == minChunkZ) ? (minZ - baseZ) : 0;
+					int lzEnd = (cz == maxChunkZ) ? (maxZ - baseZ) : 15;
+					for (int lx = lxStart; lx <= lxEnd; lx++) {
+						int wx = baseX + lx;
+						for (int lz = lzStart; lz <= lzEnd; lz++) {
+							int wz = baseZ + lz;
+							for (int ly = lyStart; ly <= lyEnd; ly++) {
 								int wy = baseY + ly;
-								int wz = baseZ + lz;
-								if (wx < minX || wx > maxX || wz < minZ || wz > maxZ || wy < minY || wy > maxY) {
-									continue;
-								}
 								BlockState state = section.getBlockState(lx, ly, lz);
 								if (XrayModule.isOre(state)) {
 									long posLong = BlockPos.asLong(wx, wy, wz);
@@ -95,7 +125,6 @@ public final class XrayRenderer {
 		}
 
 		LongSet visited = new LongOpenHashSet();
-		LongSet used = new LongOpenHashSet();
 
 		for (long startLong : orePositions) {
 			if (visited.contains(startLong)) {
@@ -104,7 +133,6 @@ public final class XrayRenderer {
 			Block startBlock = positionToBlock.get(startLong);
 
 			List<VoxelShape> blockShapes = new ArrayList<>();
-			List<Long> groupBlocks = new ArrayList<>();
 			Deque<Long> queue = new ArrayDeque<>();
 			queue.add(startLong);
 			visited.add(startLong);
@@ -125,9 +153,7 @@ public final class XrayRenderer {
 				if (hasExposedFace) {
 					blockShapes.add(Shapes.box(pos.getX(), pos.getY(), pos.getZ(),
 						pos.getX() + 1.0, pos.getY() + 1.0, pos.getZ() + 1.0));
-					used.add(currentLong);
 				}
-				groupBlocks.add(currentLong);
 
 				for (int[] offset : NEIGHBORS) {
 					long neighbor = BlockPos.asLong(pos.getX() + offset[0], pos.getY() + offset[1], pos.getZ() + offset[2]);
@@ -149,8 +175,28 @@ public final class XrayRenderer {
 				merged = Shapes.joinUnoptimized(merged, blockShapes.get(i), net.minecraft.world.phys.shapes.BooleanOp.OR);
 			}
 
-			int color = XrayModule.getBlockColor(startBlock);
-			collector.submitShapeOutline(poseStack, merged, XrayRenderType.XRAY, color, 2.0f, true);
+			cachedOutlines.add(new Outline(merged, XrayModule.getBlockColor(startBlock)));
+		}
+	}
+
+	public static void render(com.mojang.blaze3d.vertex.PoseStack poseStack,
+							  net.minecraft.client.renderer.SubmitNodeCollector collector,
+							  Vec3 cameraPos) {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.level == null || mc.player == null || !XrayModule.isActive()) {
+			return;
+		}
+		int radius = XrayModule.getRadius();
+		int verticalRadius = XrayModule.getVerticalRadius();
+		int version = XrayModule.getBlockCacheVersion();
+		BlockPos center = mc.player.blockPosition();
+
+		if (isDirty(mc, center, radius, verticalRadius, version)) {
+			rebuild(mc, center, radius, verticalRadius, version);
+		}
+
+		for (Outline outline : cachedOutlines) {
+			collector.submitShapeOutline(poseStack, outline.shape, XrayRenderType.XRAY, outline.color, 2.0f, true);
 		}
 	}
 }

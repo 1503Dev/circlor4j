@@ -166,6 +166,12 @@ public class Lang {
             Map.entry("module.xray.mode.overlay.name", "Overlay"),
             Map.entry("module.xray.mode.transparent.name", "Transparent"),
             Map.entry("module.xray.radius.name", "Radius"),
+            Map.entry("module.xray.vertical_radius.name", "Vertical Radius"),
+            Map.entry("module.xray.blocks.name", "Blocks"),
+            Map.entry("module.xray.colors.name", "Render Color"),
+            Map.entry("ui.block_list.copy_id", "Copy ID"),
+            Map.entry("ui.block_list.delete", "Delete"),
+            Map.entry("ui.color_list.restore_default", "Restore Default"),
             Map.entry("module.zoom.name", "Zoom"),
             Map.entry("module.zoom.description", "Modify your FOV"),
             Map.entry("module.zoom.fov.name", "FOV"),
@@ -185,7 +191,10 @@ public class Lang {
             Map.entry("module.tracer.players.name", "Players"),
             Map.entry("module.tracer.players.color.name", "Color"),
             Map.entry("module.tracer.items.name", "Items"),
-            Map.entry("module.tracer.items.color.name", "Color")
+            Map.entry("module.tracer.items.color.name", "Color"),
+            Map.entry("module.timer.name", "Timer"),
+            Map.entry("module.timer.description", "Changes the client tick speed"),
+            Map.entry("module.timer.tps.name", "TPS")
     );
     public static final Map<String, String> zh_hans = Map.<String, String>ofEntries(
             Map.entry("language.name", "简体中文"),
@@ -341,6 +350,12 @@ public class Lang {
             Map.entry("module.xray.mode.overlay.name", "方框"),
             Map.entry("module.xray.mode.transparent.name", "透明"),
             Map.entry("module.xray.radius.name", "半径"),
+            Map.entry("module.xray.vertical_radius.name", "垂直半径"),
+            Map.entry("module.xray.blocks.name", "方块列表"),
+            Map.entry("module.xray.colors.name", "渲染颜色"),
+            Map.entry("ui.block_list.copy_id", "复制ID"),
+            Map.entry("ui.block_list.delete", "删除"),
+            Map.entry("ui.color_list.restore_default", "恢复默认"),
             Map.entry("module.zoom.name", "缩放"),
             Map.entry("module.zoom.description", "修改游戏视野"),
             Map.entry("module.zoom.fov.name", "FOV"),
@@ -360,7 +375,9 @@ public class Lang {
             Map.entry("module.tracer.players.name", "追踪玩家"),
             Map.entry("module.tracer.players.color.name", "颜色"),
             Map.entry("module.tracer.items.name", "追踪掉落物"),
-            Map.entry("module.tracer.items.color.name", "颜色")
+            Map.entry("module.tracer.items.color.name", "颜色"),
+            Map.entry("module.timer.name", "变速齿轮"),
+            Map.entry("module.timer.description", "修改客户端计时器速度")
     );
     public static final Map<String, Map<String, String>> languages = Map.of(
             "en", en,

@@ -19,6 +19,7 @@ public class XrayModule extends Module {
 	public static final String BLOCKS = "blocks";
 	public static final String COLORS = "colors";
 	private static final String RADIUS = "radius";
+	private static final String VERTICAL_RADIUS = "vertical_radius";
 
 	private static final String[] DEFAULT_ORES = {
 		"minecraft:coal_ore",
@@ -69,12 +70,14 @@ public class XrayModule extends Module {
 	private static final Set<Block> cachedEnabledBlocks = new HashSet<>();
 	private static final Map<Block, Integer> cachedBlockColors = new HashMap<>();
 	private static int cacheTick = 0;
+	private static int cacheVersion = 0;
 
 	public XrayModule(StatusManager status) {
 		super(status, ID, "Xray", "Reveals ores through walls", ModuleCategory.RENDER);
 		this.registerBlockList(BLOCKS, "Blocks", DEFAULT_ORES);
 		this.registerColorList(COLORS, "Render Color", BLOCKS);
 		this.registerSlider(RADIUS, "Radius", 1.0, 6.0, 1.0, 2.0);
+		this.registerSlider(VERTICAL_RADIUS, "Vertical Radius", 1.0, 12.0, 1.0, 8.0);
 	}
 
 	@Override
@@ -92,6 +95,10 @@ public class XrayModule extends Module {
 		return (int) StatusManager.getInstance().getDouble(ID + "/" + RADIUS, 2.0);
 	}
 
+	public static int getVerticalRadius() {
+		return (int) StatusManager.getInstance().getDouble(ID + "/" + VERTICAL_RADIUS, 8.0);
+	}
+
 	private static String blocksPrefix() {
 		return ID + "/" + BLOCKS + "/";
 	}
@@ -101,6 +108,7 @@ public class XrayModule extends Module {
 	}
 
 	public static void refreshBlockCache() {
+		Set<Block> previous = new HashSet<>(cachedEnabledBlocks);
 		cachedEnabledBlocks.clear();
 		StatusManager status = StatusManager.getInstance();
 		Map<String, Double> entries = status.entriesWithPrefix(blocksPrefix());
@@ -114,9 +122,13 @@ public class XrayModule extends Module {
 				cachedEnabledBlocks.add(block);
 			}
 		}
+		if (!cachedEnabledBlocks.equals(previous)) {
+			cacheVersion++;
+		}
 	}
 
 	public static void refreshColorCache() {
+		Map<Block, Integer> previous = new HashMap<>(cachedBlockColors);
 		cachedBlockColors.clear();
 		for (Block block : cachedEnabledBlocks) {
 			Identifier id = BuiltInRegistries.BLOCK.getKey(block);
@@ -125,6 +137,13 @@ public class XrayModule extends Module {
 			int color = StatusManager.getInstance().getInt(colorPath(key), defaultColor);
 			cachedBlockColors.put(block, color);
 		}
+		if (!cachedBlockColors.equals(previous)) {
+			cacheVersion++;
+		}
+	}
+
+	public static int getBlockCacheVersion() {
+		return cacheVersion;
 	}
 
 	@Override

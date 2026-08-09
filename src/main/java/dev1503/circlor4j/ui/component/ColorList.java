@@ -1,11 +1,13 @@
 package dev1503.circlor4j.ui.component;
 
 import dev1503.circlor4j.client.module.modules.XrayModule;
+import dev1503.circlor4j.i18n.I18n;
 import dev1503.circlor4j.ui.StatusManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
@@ -18,9 +20,9 @@ import java.util.Map;
 
 /**
  * A read-only, colour-editor popup synced with a block list. It lists the blocks from the sync
- * prefix (no add/delete/toggle), renders each item with a coloured border, opens an inline RGB
- * editor on left-click and a [Restore Default] context menu on right-click. Per-block colours are
- * stored as packed ARGB ints at "{colorsPath}/{blockId}".
+ * prefix (no add/delete/toggle), renders each item with a coloured border and opens the shared
+ * {@link ColorPicker} on left-click and a [Restore Default] context menu on right-click. Per-block
+ * colours are stored as packed ARGB ints at "{colorsPath}/{blockId}".
  */
 public class ColorList extends Component {
 	private static final int WIN_W = 140;
@@ -29,9 +31,6 @@ public class ColorList extends Component {
 	private static final int BORDER_W = 3;
 	private static final int MAX_VISIBLE = 8;
 	private static final int SCROLLBAR_W = 2;
-	private static final int EDIT_H = 30;
-	private static final int SLIDER_W = 80;
-	private static final int TRACK_H = 3;
 
 	private static final int ROW_HOVER_COLOR = 0x40FFFFFF;
 	private static final int ROW_TEXT_COLOR = 0xFFAAAAAA;
@@ -43,14 +42,8 @@ public class ColorList extends Component {
 	private static final int ITEM_NAME_COLOR = 0xFFFFFFFF;
 	private static final int ITEM_ID_COLOR = 0xFF777777;
 	private static final int SCROLLBAR_COLOR = 0xFF9A9A9A;
-	private static final int EDIT_BG_COLOR = 0x30FFFFFF;
-	private static final int SLIDER_TRACK_COLOR = 0xFF444444;
-	private static final int SLIDER_LABEL_COLOR = 0xFFCCCCCC;
-	private static final int PREVIEW_BORDER = 0xFF000000;
 
 	private static final int PAD = 2;
-
-	private enum EditChannel { RED, GREEN, BLUE }
 
 	private final StatusManager status;
 	private final String label;
@@ -63,11 +56,10 @@ public class ColorList extends Component {
 
 	private boolean windowOpen;
 	private int scroll;
-	private int editingIndex = -1;
-	private EditChannel dragChannel = null;
 
 	private final List<String> members = new ArrayList<>();
 	private final ContextMenu contextMenu = new ContextMenu();
+	private ColorPicker activePicker;
 
 	public ColorList(StatusManager status, String path, String label, String syncBlocksOption, int x, int y, int width, int height) {
 		super(path);
@@ -107,7 +99,7 @@ public class ColorList extends Component {
 
 	public void closeWindow() {
 		this.windowOpen = false;
-		this.editingIndex = -1;
+		this.activePicker = null;
 		this.contextMenu.close();
 	}
 
@@ -147,16 +139,8 @@ public class ColorList extends Component {
 		return Math.max(0, Math.min(this.y, screenH - winH()));
 	}
 
-	private boolean isEditing() {
-		return this.editingIndex >= 0 && this.editingIndex < this.members.size();
-	}
-
-	private int editPanelH() {
-		return this.isEditing() ? EDIT_H : 0;
-	}
-
 	private int winH() {
-		return PAD + MAX_VISIBLE * ITEM_H + PAD + this.editPanelH();
+		return PAD + MAX_VISIBLE * ITEM_H + PAD;
 	}
 
 	public boolean containsWindow(int mx, int my) {
@@ -165,12 +149,12 @@ public class ColorList extends Component {
 		return mx >= wx && mx < wx + WIN_W && my >= wy && my < wy + winH();
 	}
 
-	private int listTop() {
-		return this.winY() + PAD;
+	private boolean pickerContains(int mx, int my) {
+		return this.activePicker.containsWindow(mx, my);
 	}
 
-	private int editTop() {
-		return this.winY() + PAD + MAX_VISIBLE * ITEM_H + PAD;
+	private int listTop() {
+		return this.winY() + PAD;
 	}
 
 	private int visibleCapacity() {
@@ -191,7 +175,7 @@ public class ColorList extends Component {
 		}
 		this.windowOpen = !this.windowOpen;
 		if (this.windowOpen) {
-			this.editingIndex = -1;
+			this.activePicker = null;
 			this.clampScroll();
 		}
 		return true;
@@ -203,53 +187,72 @@ public class ColorList extends Component {
 		}
 		int mx = (int) event.x();
 		int my = (int) event.y();
-		if (!this.containsWindow(mx, my)) {
+		boolean inList = this.containsWindow(mx, my);
+		boolean inPicker = this.activePicker != null && this.activePicker.isWindowOpen() && this.pickerContains(mx, my);
+		if (!inList && !inPicker) {
 			return false;
 		}
-		boolean menuWasOpen = this.contextMenu.isOpen();
 		if (this.contextMenu.mouseClicked(event)) {
 			return true;
 		}
-		if (menuWasOpen) {
-			return true;
-		}
-		if (event.button() == 0 && this.isEditing() && this.inEditPanel(mx, my)) {
-			EditChannel ch = this.channelAt(mx, my);
-			if (ch != null) {
-				this.dragChannel = ch;
-				this.updateChannelFromMouse(ch, mx);
+		if (this.activePicker != null) {
+			if (this.activePicker.mouseClickedWindow(event, font)) {
+				if (!this.activePicker.isWindowOpen()) {
+					this.activePicker = null;
+				}
 				return true;
 			}
+			this.activePicker.closeWindow();
+			this.activePicker = null;
+			if (event.button() == 0) {
+				int index = this.itemAt(mx, my);
+				if (index >= 0 && index < this.members.size()) {
+					this.openPicker(index, mx, my);
+					return true;
+				}
+			}
+			return true;
 		}
 		int index = this.itemAt(mx, my);
 		if (index >= 0 && index < this.members.size()) {
 			if (event.button() == 0) {
-				this.editingIndex = index;
+				this.openPicker(index, mx, my);
 			} else if (event.button() == 1) {
 				this.openContextMenu(index, mx, my);
 			}
 			return true;
 		}
-		this.editingIndex = -1;
 		return true;
 	}
 
 	public boolean mouseDraggedWindow(int mx, int my) {
-		if (this.dragChannel == null) {
-			return false;
+		if (this.activePicker != null && this.activePicker.isWindowOpen()) {
+			return this.activePicker.mouseDraggedWindow(mx, my);
 		}
-		this.updateChannelFromMouse(this.dragChannel, mx);
-		return true;
+		return false;
 	}
 
 	public void mouseReleasedWindow() {
-		this.dragChannel = null;
+		if (this.activePicker != null && this.activePicker.isWindowOpen()) {
+			this.activePicker.mouseReleasedWindow();
+		}
+	}
+
+	private void openPicker(int index, int mx, int my) {
+		String id = this.members.get(index);
+		Block block = BuiltInRegistries.BLOCK.getValue(Identifier.tryParse(id));
+		String name = block != null ? block.getName().getString() : id;
+		ColorPicker picker = new ColorPicker(this.status, this.colorPath(id), name, XrayModule.defaultColorFor(id), mx, my, this.width, CategoryWindow.ROW_HEIGHT);
+		picker.setPosition(mx, my);
+		this.activePicker = picker;
+		MouseButtonEvent event = new MouseButtonEvent(mx, my, new MouseButtonInfo(0, 0));
+		this.activePicker.mouseClickedRow(event);
 	}
 
 	private void openContextMenu(int index, int mx, int my) {
 		this.contextMenu.close();
 		String id = this.members.get(index);
-		this.contextMenu.add("恢复默认", () -> {
+		this.contextMenu.add(I18n.t("ui.color_list.restore_default"), () -> {
 			this.status.setValue(this, this.colorPath(id), XrayModule.defaultColorFor(id));
 		});
 		this.contextMenu.open(mx, my);
@@ -279,69 +282,6 @@ public class ColorList extends Component {
 		return index < this.members.size() ? index : -1;
 	}
 
-	private int editingColor() {
-		String id = this.members.get(this.editingIndex);
-		return this.status.getInt(this.colorPath(id), XrayModule.defaultColorFor(id));
-	}
-
-	private void setEditingColor(int argb) {
-		String id = this.members.get(this.editingIndex);
-		this.status.setValue(this, this.colorPath(id), argb);
-	}
-
-	private int channelValue(int argb, EditChannel ch) {
-		return switch (ch) {
-			case RED -> (argb >> 16) & 0xFF;
-			case GREEN -> (argb >> 8) & 0xFF;
-			case BLUE -> argb & 0xFF;
-		};
-	}
-
-	private int withChannel(int argb, EditChannel ch, int value) {
-		value = Math.max(0, Math.min(255, value));
-		return switch (ch) {
-			case RED -> (argb & 0xFF00FFFF) | (value << 16);
-			case GREEN -> (argb & 0xFFFF00FF) | (value << 8);
-			case BLUE -> (argb & 0xFFFFFF00) | value;
-		};
-	}
-
-	private int sliderLeft() {
-		return this.winX() + 18;
-	}
-
-	private int sliderRight() {
-		return this.sliderLeft() + SLIDER_W;
-	}
-
-	private int channelRowY(EditChannel ch) {
-		return this.editTop() + 3 + ch.ordinal() * 9;
-	}
-
-	private boolean inEditPanel(int mx, int my) {
-		return this.isEditing() && my >= this.editTop() && my < this.editTop() + EDIT_H;
-	}
-
-	private EditChannel channelAt(int mx, int my) {
-		if (mx < this.sliderLeft() || mx >= this.sliderRight()) {
-			return null;
-		}
-		for (EditChannel ch : EditChannel.values()) {
-			int rowY = this.channelRowY(ch);
-			if (my >= rowY && my < rowY + 9) {
-				return ch;
-			}
-		}
-		return null;
-	}
-
-	private void updateChannelFromMouse(EditChannel ch, int mx) {
-		double t = (mx - this.sliderLeft()) / (double) SLIDER_W;
-		t = Math.max(0.0, Math.min(1.0, t));
-		int value = (int) Math.round(t * 255.0);
-		this.setEditingColor(this.withChannel(this.editingColor(), ch, value));
-	}
-
 	public void renderRow(GuiGraphicsExtractor graphics, Font font, int mouseX, int mouseY) {
 		if (this.containsRow(mouseX, mouseY)) {
 			graphics.fill(this.x, this.y, this.x + this.width, this.y + this.height, ROW_HOVER_COLOR);
@@ -354,14 +294,15 @@ public class ColorList extends Component {
 		if (!this.windowOpen) {
 			return;
 		}
+		this.rebuildMembers();
 		int wx = this.winX();
 		int wy = this.winY();
 		int wh = winH();
 		graphics.fill(wx, wy, wx + WIN_W, wy + wh, WIN_BG_COLOR);
 		graphics.outline(wx, wy, WIN_W, wh, WIN_BORDER_COLOR);
 		this.renderList(graphics, font, mouseX, mouseY, wx, wy);
-		if (this.isEditing()) {
-			this.renderEditor(graphics, font, mouseX, mouseY, wx);
+		if (this.activePicker != null && this.activePicker.isWindowOpen()) {
+			this.activePicker.renderWindow(graphics, font, mouseX, mouseY);
 		}
 		this.contextMenu.render(graphics, font, mouseX, mouseY);
 	}
@@ -378,10 +319,7 @@ public class ColorList extends Component {
 			String id = this.members.get(index);
 			int itemY = listTop + i * ITEM_H;
 			boolean hover = mouseY >= itemY && mouseY < itemY + ITEM_H && mouseX >= listLeft && mouseX < listLeft + listW;
-			boolean selected = index == this.editingIndex;
-			if (selected) {
-				graphics.fill(listLeft, itemY, listLeft + listW, itemY + ITEM_H, ITEM_HOVER_COLOR);
-			} else if (hover) {
+			if (hover) {
 				graphics.fill(listLeft, itemY, listLeft + listW, itemY + ITEM_H, ITEM_HOVER_COLOR);
 			} else {
 				graphics.fill(listLeft, itemY, listLeft + listW, itemY + ITEM_H, ITEM_BG_COLOR);
@@ -405,40 +343,6 @@ public class ColorList extends Component {
 			int thumbY = listTop + (trackH - thumbH) * this.scroll / Math.max(1, this.maxScroll());
 			int sbX = wx + WIN_W - PAD - SCROLLBAR_W;
 			graphics.fill(sbX, thumbY, sbX + SCROLLBAR_W, thumbY + thumbH, SCROLLBAR_COLOR);
-		}
-	}
-
-	private void renderEditor(GuiGraphicsExtractor graphics, Font font, int mouseX, int mouseY, int wx) {
-		int top = this.editTop();
-		int color = this.editingColor();
-		graphics.fill(wx + PAD, top, wx + WIN_W - PAD, top + EDIT_H, EDIT_BG_COLOR);
-		int previewX = wx + WIN_W - PAD - 12;
-		graphics.fill(previewX, top + 3, previewX + 12, top + EDIT_H - 3, color);
-		graphics.outline(previewX, top + 3, 12, EDIT_H - 6, PREVIEW_BORDER);
-
-		int labelX = wx + PAD;
-		for (EditChannel ch : EditChannel.values()) {
-			int rowY = this.channelRowY(ch);
-			String tag = switch (ch) {
-				case RED -> "R";
-				case GREEN -> "G";
-				case BLUE -> "B";
-			};
-			UiText.scaledText(graphics, font, tag, labelX, UiText.centerY(rowY, 9), SLIDER_LABEL_COLOR);
-			int value = this.channelValue(color, ch);
-			int trackY = rowY + (9 - TRACK_H) / 2;
-			int left = this.sliderLeft();
-			int right = this.sliderRight();
-			graphics.fill(left, trackY, right, trackY + TRACK_H, SLIDER_TRACK_COLOR);
-			int filled = left + (int) Math.round((value / 255.0) * SLIDER_W);
-			int channelColor = switch (ch) {
-				case RED -> 0xFFFF0000;
-				case GREEN -> 0xFF00FF00;
-				case BLUE -> 0xFF0000FF;
-			};
-			graphics.fill(left, trackY, filled, trackY + TRACK_H, channelColor);
-			String valStr = value + "";
-			UiText.scaledText(graphics, font, valStr, right + 2, UiText.centerY(rowY, 9), SLIDER_LABEL_COLOR);
 		}
 	}
 

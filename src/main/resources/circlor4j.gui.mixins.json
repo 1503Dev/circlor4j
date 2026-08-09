@@ -14,6 +14,7 @@
 		"EntityMixin",
 		"KeyboardInputMixin",
 		"LivingEntityMixin",
+		"TimerDeltaTrackerMixin",
 		"WebBlockMixin"
 	],
 	"injectors": {

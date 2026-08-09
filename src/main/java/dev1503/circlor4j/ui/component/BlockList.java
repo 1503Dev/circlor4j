@@ -1,6 +1,8 @@
 package dev1503.circlor4j.ui.component;
 
+import dev1503.circlor4j.i18n.I18n;
 import dev1503.circlor4j.ui.StatusManager;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -264,8 +266,8 @@ public class BlockList extends Component {
 	private void openContextMenu(int index, int mx, int my) {
 		this.contextMenu.close();
 		String id = this.members.get(index);
-		this.contextMenu.add("复制ID", () -> this.copyIdToClipboard(id));
-		this.contextMenu.add("删除", () -> {
+		this.contextMenu.add(I18n.t("ui.block_list.copy_id"), () -> this.copyIdToClipboard(id));
+		this.contextMenu.add(I18n.t("ui.block_list.delete"), () -> {
 			this.status.remove(this.blockPath(id));
 			this.rebuildMembers();
 			this.clampScroll();
@@ -310,15 +312,12 @@ public class BlockList extends Component {
 		if (raw.isEmpty()) {
 			return;
 		}
-		Identifier id = Identifier.tryParse(raw);
+		String path = raw.contains(":") ? raw : "minecraft:" + raw;
+		Identifier id = Identifier.tryParse(path);
 		if (id == null) {
 			id = Identifier.tryBuild("minecraft", raw);
 		}
 		if (id == null) {
-			return;
-		}
-		Block block = BuiltInRegistries.BLOCK.getValue(id);
-		if (block == null || block == Blocks.AIR) {
 			return;
 		}
 		String key = id.toString();
@@ -333,6 +332,13 @@ public class BlockList extends Component {
 	public boolean keyPressed(KeyEvent event) {
 		if (!this.inputActive) {
 			return false;
+		}
+		if (event.isPaste()) {
+			String clipboard = Minecraft.getInstance().keyboardHandler.getClipboard();
+			if (clipboard != null) {
+				this.inputBuffer = this.inputBuffer + ChatFormatting.stripFormatting(clipboard.replaceAll("\\r", ""));
+			}
+			return true;
 		}
 		if (event.key() == com.mojang.blaze3d.platform.InputConstants.KEY_BACKSPACE) {
 			if (!this.inputBuffer.isEmpty()) {

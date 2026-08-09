@@ -32,6 +32,7 @@ import dev1503.circlor4j.client.module.modules.NukerModule;
 import dev1503.circlor4j.client.module.modules.ReachModule;
 import dev1503.circlor4j.client.module.modules.ScaffoldModule;
 import dev1503.circlor4j.client.module.modules.SpeedModule;
+import dev1503.circlor4j.client.module.modules.TimerModule;
 import dev1503.circlor4j.client.module.modules.TracerModule;
 import dev1503.circlor4j.client.module.modules.TrueSightModule;
 import dev1503.circlor4j.client.module.modules.XrayModule;
@@ -100,6 +101,7 @@ public final class Circlor4jClient {
 		ModuleManager.register(new ReachModule(status));
 		ModuleManager.register(new ScaffoldModule(status));
 		ModuleManager.register(new SpeedModule(status));
+		ModuleManager.register(new TimerModule(status));
 		ModuleManager.register(new TracerModule(status));
 		ModuleManager.register(new TrueSightModule(status));
 		ModuleManager.register(new XrayModule(status));
