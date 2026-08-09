@@ -19,7 +19,6 @@
 		"AntiDebuffLocalPlayerMixin",
 		"FlyLocalPlayerMixin",
 		"FlyTravelMixin",
-		"LightmapRenderStateExtractorMixin",
 		"LivingEntityAccessor",
 		"LowFireScreenEffectMixin",
 		"NoHurtCamGameRendererMixin",
