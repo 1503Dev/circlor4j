@@ -4,6 +4,7 @@ import dev1503.circlor4j.client.keybind.KeyBindManager;
 import dev1503.circlor4j.client.module.ModuleManager;
 import dev1503.circlor4j.client.module.modules.AutoClickerModule;
 import dev1503.circlor4j.client.module.modules.AimBotModule;
+import dev1503.circlor4j.client.module.modules.AntiDebuffModule;
 import dev1503.circlor4j.client.module.modules.ArraylistModule;
 import dev1503.circlor4j.client.module.modules.AutoClickerModule;
 import dev1503.circlor4j.client.module.modules.AutoSprintModule;
@@ -15,6 +16,7 @@ import dev1503.circlor4j.client.module.modules.CrystalAuraModule;
 import dev1503.circlor4j.client.module.modules.EspModule;
 import dev1503.circlor4j.client.module.modules.FastStopModule;
 import dev1503.circlor4j.client.module.modules.FullBrightModule;
+import dev1503.circlor4j.client.module.modules.FlyModule;
 import dev1503.circlor4j.client.module.modules.FreecamModule;
 import dev1503.circlor4j.client.module.modules.FreelookModule;
 import dev1503.circlor4j.client.module.modules.FullBrightModule;
@@ -76,6 +78,7 @@ public final class Circlor4jClient {
 
 		ModuleManager.register(new ArraylistModule(status));
 		ModuleManager.register(new AirJumpModule(status));
+		ModuleManager.register(new AntiDebuffModule(status));
 		ModuleManager.register(new AimBotModule(status));
 		ModuleManager.register(new AntiKnockbackModule(status));
 		ModuleManager.register(new AutoClickerModule(status));
@@ -85,6 +88,7 @@ public final class Circlor4jClient {
 		ModuleManager.register(new CrystalAuraModule(status));
 		ModuleManager.register(new EspModule(status));
 		ModuleManager.register(new FastStopModule(status));
+		ModuleManager.register(new FlyModule(status));
 		ModuleManager.register(new FreecamModule(status));
 		ModuleManager.register(new FreelookModule(status));
 		ModuleManager.register(new FullBrightModule(status));
