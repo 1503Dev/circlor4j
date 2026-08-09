@@ -139,6 +139,28 @@ public class CategoryWindow {
 						}
 					}
 					toggle.addChild(subToggle);
+				} else if (setting instanceof Module.BlockListSetting s) {
+					BlockList blockList = new BlockList(
+						status, s.path(), tr(s.labelKey(), s.labelFallback()), s.defaultBlockIds(), x, y, WIDTH, ROW_HEIGHT
+					);
+					blockList.setShowCondition(s.showCondition());
+					Toggle parent = findChildToggle(toggle, module.getId() + "/" + s.parentOption() + "/enabled");
+					if (parent != null) {
+						parent.addChild(blockList);
+					} else {
+						toggle.addChild(blockList);
+					}
+				} else if (setting instanceof Module.ColorListSetting s) {
+					ColorList colorList = new ColorList(
+						status, s.path(), tr(s.labelKey(), s.labelFallback()), s.syncBlocksOption(), x, y, WIDTH, ROW_HEIGHT
+					);
+					colorList.setShowCondition(s.showCondition());
+					Toggle parent = findChildToggle(toggle, module.getId() + "/" + s.parentOption() + "/enabled");
+					if (parent != null) {
+						parent.addChild(colorList);
+					} else {
+						toggle.addChild(colorList);
+					}
 				} else if (setting instanceof Module.ColorSetting s) {
 					ColorPicker picker = new ColorPicker(
 						status, s.path(), tr(s.labelKey(), s.labelFallback()), s.defaultColor(), x, y, WIDTH, ROW_HEIGHT
@@ -288,13 +310,17 @@ public class CategoryWindow {
 		for (StatusWidget child : toggle.getChildren()) {
 			if (child instanceof Dropdown dropdown) {
 				dropdown.closeMenu();
-			} else if (child instanceof ColorPicker picker) {
-				picker.closeWindow();
-			} else if (child instanceof Toggle childToggle) {
-				this.closeMenusIn(childToggle);
-			}
+		} else if (child instanceof ColorPicker picker) {
+			picker.closeWindow();
+		} else if (child instanceof BlockList blockList) {
+			blockList.closeWindow();
+		} else if (child instanceof ColorList colorList) {
+			colorList.closeWindow();
+		} else if (child instanceof Toggle childToggle) {
+			this.closeMenusIn(childToggle);
 		}
 	}
+}
 
 	/** The open dropdown menu owned by this window, if any. */
 	public Dropdown findOpenDropdown() {
@@ -319,6 +345,57 @@ public class CategoryWindow {
 			ColorPicker picker = this.findOpenColorPickerIn(toggle);
 			if (picker != null) {
 				return picker;
+			}
+		}
+		return null;
+	}
+
+	/** The open block-list window owned by this window, if any (searches nested sub-toggles too). */
+	public BlockList findOpenBlockList() {
+		for (Toggle toggle : this.toggles) {
+			BlockList blockList = this.findOpenBlockListIn(toggle);
+			if (blockList != null) {
+				return blockList;
+			}
+		}
+		return null;
+	}
+
+	private BlockList findOpenBlockListIn(Toggle toggle) {
+		for (StatusWidget child : toggle.getChildren()) {
+			if (child instanceof BlockList blockList && blockList.isWindowOpen()) {
+				return blockList;
+			}
+			if (child instanceof Toggle childToggle) {
+				BlockList nested = this.findOpenBlockListIn(childToggle);
+				if (nested != null) {
+					return nested;
+				}
+			}
+		}
+		return null;
+	}
+
+	public ColorList findOpenColorList() {
+		for (Toggle toggle : this.toggles) {
+			ColorList colorList = this.findOpenColorListIn(toggle);
+			if (colorList != null) {
+				return colorList;
+			}
+		}
+		return null;
+	}
+
+	private ColorList findOpenColorListIn(Toggle toggle) {
+		for (StatusWidget child : toggle.getChildren()) {
+			if (child instanceof ColorList colorList && colorList.isWindowOpen()) {
+				return colorList;
+			}
+			if (child instanceof Toggle childToggle) {
+				ColorList nested = this.findOpenColorListIn(childToggle);
+				if (nested != null) {
+					return nested;
+				}
 			}
 		}
 		return null;
@@ -488,11 +565,17 @@ public class CategoryWindow {
 			} else if (row instanceof ColorPicker picker) {
 				picker.setPosition(rowX, rowY);
 				picker.setWidth(rowWidth);
-			} else if (row instanceof ActionButton action) {
-				action.setPosition(rowX, rowY);
-				action.setWidth(rowWidth);
-			}
+		} else if (row instanceof ActionButton action) {
+			action.setPosition(rowX, rowY);
+			action.setWidth(rowWidth);
+		} else if (row instanceof BlockList blockList) {
+			blockList.setPosition(rowX, rowY);
+			blockList.setWidth(rowWidth);
+		} else if (row instanceof ColorList colorList) {
+			colorList.setPosition(rowX, rowY);
+			colorList.setWidth(rowWidth);
 		}
+	}
 	}
 
 	private ResizeMode detectResize(int mx, int my) {
@@ -592,10 +675,14 @@ public class CategoryWindow {
 				dropdown.renderRow(graphics, font, effX, effY);
 			} else if (row instanceof ColorPicker picker) {
 				picker.renderRow(graphics, font, effX, effY);
-			} else if (row instanceof ActionButton action) {
-				action.render(graphics, font, effX, effY);
-			}
+		} else if (row instanceof ActionButton action) {
+			action.render(graphics, font, effX, effY);
+		} else if (row instanceof BlockList blockList) {
+			blockList.renderRow(graphics, font, effX, effY);
+		} else if (row instanceof ColorList colorList) {
+			colorList.renderRow(graphics, font, effX, effY);
 		}
+	}
 
 		for (Toggle toggle : this.toggles) {
 			this.drawExpandedBorders(toggle, graphics);
@@ -664,9 +751,15 @@ public class CategoryWindow {
 			if (row instanceof ColorPicker picker && picker.mouseClickedRow(event)) {
 				return true;
 			}
-			if (row instanceof ActionButton action && action.mouseClicked(event)) {
-				return true;
-			}
+		if (row instanceof ActionButton action && action.mouseClicked(event)) {
+			return true;
+		}
+		if (row instanceof BlockList blockList && blockList.mouseClickedRow(event)) {
+			return true;
+		}
+		if (row instanceof ColorList colorList && colorList.mouseClickedRow(event)) {
+			return true;
+		}
 		}
 		return true;
 	}

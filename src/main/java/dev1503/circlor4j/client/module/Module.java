@@ -80,6 +80,40 @@ public abstract class Module {
 	) implements Setting {
 	}
 
+	/**
+	 * A block-list option exposed to the UI as a {@link dev1503.circlor4j.ui.component.BlockList}:
+	 * a collapsible row that opens a popup for adding/toggling/removing individual blocks.
+	 * Each block's enabled state is stored at "{path}/{blockId}" as a double (1.0 = enabled).
+	 * {@code defaultBlockIds} seeds the list on first creation. {@code parentOption} names the
+	 * sub-toggle the list should be nested under. {@code showCondition} optionally gates visibility.
+	 */
+	public record BlockListSetting(
+		String path,
+		String labelKey,
+		String labelFallback,
+		String[] defaultBlockIds,
+		String parentOption,
+		String showCondition
+	) implements Setting {
+	}
+
+	/**
+	 * A colour-editor option exposed to the UI as a {@link dev1503.circlor4j.ui.component.ColorList}:
+	 * a collapsible row that opens a popup listing the blocks from {@code syncBlocksOption} (read-only,
+	 * synced with that block list). Each item renders a coloured border and a left-click opens a colour
+	 * picker while a right-click restores the default colour. Per-block colours are stored as packed
+	 * ARGB ints at "{path}/{blockId}". {@code parentOption} names the sub-toggle to nest under.
+	 */
+	public record ColorListSetting(
+		String path,
+		String labelKey,
+		String labelFallback,
+		String syncBlocksOption,
+		String parentOption,
+		String showCondition
+	) implements Setting {
+	}
+
 	private final StatusManager status;
 	private final String id;
 	private final String name;
@@ -252,6 +286,49 @@ public abstract class Module {
 		String path = this.id + "/" + option + "/color";
 		this.status.setValueOnly(path, defaultColor);
 		this.settings.add(new ColorSetting(path, "module." + this.id + "." + option + ".color.name", label, defaultColor, option, showCondition));
+	}
+
+	/**
+	 * Registers a block-list option on path "{id}/{option}". Each block's enabled state is stored at
+	 * "{path}/{blockId}" as a double (1.0 = enabled). {@code defaultBlockIds} are seeded as enabled
+	 * entries (only where no saved value already exists), so the feature works before the GUI is ever
+	 * opened; the user's own edits then persist across launches. {@code parentOption} names the
+	 * sub-toggle the list should be nested under. {@code showCondition} optionally gates visibility.
+	 */
+	protected void registerBlockList(String option, String label, String[] defaultBlockIds) {
+		this.registerBlockList(option, label, defaultBlockIds, null, null);
+	}
+
+	protected void registerBlockList(String option, String label, String[] defaultBlockIds, String parentOption) {
+		this.registerBlockList(option, label, defaultBlockIds, parentOption, null);
+	}
+
+	protected void registerBlockList(String option, String label, String[] defaultBlockIds, String parentOption, String showCondition) {
+		String path = this.id + "/" + option;
+		String prefix = path + "/";
+		for (String blockId : defaultBlockIds) {
+			if (!this.status.contains(prefix + blockId)) {
+				this.status.setValueOnly(prefix + blockId, 1.0);
+			}
+		}
+		this.settings.add(
+			new BlockListSetting(path, "module." + this.id + "." + option + ".name", label, defaultBlockIds.clone(), parentOption, showCondition)
+		);
+	}
+
+	protected void registerColorList(String option, String label, String syncBlocksOption) {
+		this.registerColorList(option, label, syncBlocksOption, null, null);
+	}
+
+	protected void registerColorList(String option, String label, String syncBlocksOption, String parentOption) {
+		this.registerColorList(option, label, syncBlocksOption, parentOption, null);
+	}
+
+	protected void registerColorList(String option, String label, String syncBlocksOption, String parentOption, String showCondition) {
+		String path = this.id + "/" + option;
+		this.settings.add(
+			new ColorListSetting(path, "module." + this.id + "." + option + ".name", label, syncBlocksOption, parentOption, showCondition)
+		);
 	}
 
 	/** Called by the StatusManager listener for any status path change that is not an enabled path. */

@@ -5,7 +5,9 @@ import dev1503.circlor4j.client.module.ModuleCategory;
 import dev1503.circlor4j.client.module.modules.ClickGuiModule;
 import dev1503.circlor4j.i18n.I18n;
 import dev1503.circlor4j.ui.StatusManager;
+import dev1503.circlor4j.ui.component.BlockList;
 import dev1503.circlor4j.ui.component.CategoryWindow;
+import dev1503.circlor4j.ui.component.ColorList;
 import dev1503.circlor4j.ui.component.ColorPicker;
 import dev1503.circlor4j.ui.component.Dropdown;
 import dev1503.circlor4j.ui.component.Slider;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
@@ -24,6 +27,8 @@ public class ClickGuiScreen extends Screen {
 	private final List<CategoryWindow> windows = new ArrayList<>();
 	private Dropdown activeMenu;
 	private ColorPicker activePicker;
+	private BlockList activeBlockList;
+	private ColorList activeColorList;
 	private String renderedLang;
 	private int lastMouseX;
 	private int lastMouseY;
@@ -57,6 +62,8 @@ public class ClickGuiScreen extends Screen {
 		StatusManager.getInstance().clearWidgets();
 		this.activeMenu = null;
 		this.activePicker = null;
+		this.activeBlockList = null;
+		this.activeColorList = null;
 		this.buildWindows(current);
 	}
 
@@ -135,9 +142,13 @@ public class ClickGuiScreen extends Screen {
 
 		this.activeMenu = this.findOpenDropdown();
 		this.activePicker = this.findOpenColorPicker();
+		this.activeBlockList = this.findOpenBlockList();
+		this.activeColorList = this.findOpenColorList();
 		boolean menuCovers = this.activeMenu != null && this.activeMenu.containsMenu(this.font, mouseX, mouseY);
 		boolean pickerCovers = this.activePicker != null && this.activePicker.containsWindow(mouseX, mouseY);
-		boolean popupCovers = menuCovers || pickerCovers;
+		boolean blockListCovers = this.activeBlockList != null && this.activeBlockList.containsWindow(mouseX, mouseY);
+		boolean colorListCovers = this.activeColorList != null && this.activeColorList.containsWindow(mouseX, mouseY);
+		boolean popupCovers = menuCovers || pickerCovers || blockListCovers || colorListCovers;
 		for (CategoryWindow window : this.windows) {
 			window.setScreenSize(this.width, this.height);
 			window.clampToScreen();
@@ -149,6 +160,12 @@ public class ClickGuiScreen extends Screen {
 		}
 		if (this.activePicker != null) {
 			this.activePicker.renderWindow(graphics, this.font, mouseX, mouseY);
+		}
+		if (this.activeBlockList != null) {
+			this.activeBlockList.renderWindow(graphics, this.font, mouseX, mouseY);
+		}
+		if (this.activeColorList != null) {
+			this.activeColorList.renderWindow(graphics, this.font, mouseX, mouseY);
 		}
 
 		if (!popupCovers) {
@@ -191,10 +208,46 @@ public class ClickGuiScreen extends Screen {
 			this.activeMenu.closeMenu();
 			this.activeMenu = null;
 		}
+		if (this.activeBlockList != null) {
+			if (this.activeBlockList.isContextMenuOpen()) {
+				this.activeBlockList.contextMenuClicked(event);
+				return true;
+			}
+			if (this.activeBlockList.mouseClickedWindow(event, this.font)) {
+				this.activeBlockList = this.activeBlockList.isWindowOpen() ? this.activeBlockList : null;
+				return true;
+			}
+			if (this.activeBlockList.isRow(mx, my)) {
+				this.activeBlockList.closeWindow();
+				this.activeBlockList = null;
+				return true;
+			}
+			this.activeBlockList.closeWindow();
+			this.activeBlockList = null;
+		}
+		if (this.activeColorList != null) {
+			if (this.activeColorList.isContextMenuOpen()) {
+				this.activeColorList.contextMenuClicked(event);
+				return true;
+			}
+			if (this.activeColorList.mouseClickedWindow(event, this.font)) {
+				this.activeColorList = this.activeColorList.isWindowOpen() ? this.activeColorList : null;
+				return true;
+			}
+			if (this.activeColorList.isRow(mx, my)) {
+				this.activeColorList.closeWindow();
+				this.activeColorList = null;
+				return true;
+			}
+			this.activeColorList.closeWindow();
+			this.activeColorList = null;
+		}
 		for (int i = this.windows.size() - 1; i >= 0; i--) {
 			if (this.windows.get(i).mouseClicked(event)) {
 				this.activeMenu = this.findOpenDropdown();
 				this.activePicker = this.findOpenColorPicker();
+				this.activeBlockList = this.findOpenBlockList();
+				this.activeColorList = this.findOpenColorList();
 				return true;
 			}
 		}
@@ -221,9 +274,32 @@ public class ClickGuiScreen extends Screen {
 		return null;
 	}
 
+	private BlockList findOpenBlockList() {
+		for (int i = this.windows.size() - 1; i >= 0; i--) {
+			BlockList blockList = this.windows.get(i).findOpenBlockList();
+			if (blockList != null) {
+				return blockList;
+			}
+		}
+		return null;
+	}
+
+	private ColorList findOpenColorList() {
+		for (int i = this.windows.size() - 1; i >= 0; i--) {
+			ColorList colorList = this.windows.get(i).findOpenColorList();
+			if (colorList != null) {
+				return colorList;
+			}
+		}
+		return null;
+	}
+
 	@Override
 	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
 		if (this.activePicker != null && this.activePicker.mouseDraggedWindow((int) event.x(), (int) event.y())) {
+			return true;
+		}
+		if (this.activeColorList != null && this.activeColorList.mouseDraggedWindow((int) event.x(), (int) event.y())) {
 			return true;
 		}
 		for (int i = this.windows.size() - 1; i >= 0; i--) {
@@ -239,6 +315,9 @@ public class ClickGuiScreen extends Screen {
 		if (this.activePicker != null) {
 			this.activePicker.mouseReleasedWindow();
 		}
+		if (this.activeColorList != null) {
+			this.activeColorList.mouseReleasedWindow();
+		}
 		for (CategoryWindow window : this.windows) {
 			window.mouseReleased();
 		}
@@ -247,8 +326,18 @@ public class ClickGuiScreen extends Screen {
 
 	@Override
 	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
+		int mx = (int) x;
+		int my = (int) y;
+		if (this.activeBlockList != null && this.activeBlockList.containsWindow(mx, my)) {
+			this.activeBlockList.mouseScrolled(mx, my, scrollY);
+			return true;
+		}
+		if (this.activeColorList != null && this.activeColorList.containsWindow(mx, my)) {
+			this.activeColorList.mouseScrolled(mx, my, scrollY);
+			return true;
+		}
 		for (int i = this.windows.size() - 1; i >= 0; i--) {
-			if (this.windows.get(i).mouseScrolled((int) x, (int) y, scrollY)) {
+			if (this.windows.get(i).mouseScrolled(mx, my, scrollY)) {
 				return true;
 			}
 		}
@@ -257,6 +346,9 @@ public class ClickGuiScreen extends Screen {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
+		if (this.activeBlockList != null && this.activeBlockList.isInputActive()) {
+			return this.activeBlockList.keyPressed(event);
+		}
 		if (event.isLeft() || event.isRight()) {
 			for (int i = this.windows.size() - 1; i >= 0; i--) {
 				Slider slider = this.windows.get(i).getHoveredSlider(this.lastMouseX, this.lastMouseY);
@@ -267,6 +359,14 @@ public class ClickGuiScreen extends Screen {
 			}
 		}
 		return super.keyPressed(event);
+	}
+
+	@Override
+	public boolean charTyped(CharacterEvent event) {
+		if (this.activeBlockList != null && this.activeBlockList.isInputActive()) {
+			return this.activeBlockList.charTyped(event);
+		}
+		return super.charTyped(event);
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -50,7 +51,7 @@ public final class XrayRenderer {
 		int maxY = mc.level.getMaxY();
 
 		LongSet orePositions = new LongOpenHashSet();
-		Map<Long, Integer> positionToOreType = new HashMap<>();
+		Map<Long, Block> positionToBlock = new HashMap<>();
 
 		int minChunkX = SectionPos.blockToSectionCoord(minX);
 		int maxChunkX = SectionPos.blockToSectionCoord(maxX);
@@ -84,7 +85,7 @@ public final class XrayRenderer {
 								if (XrayModule.isOre(state)) {
 									long posLong = BlockPos.asLong(wx, wy, wz);
 									orePositions.add(posLong);
-									positionToOreType.put(posLong, XrayModule.getOreType(state));
+									positionToBlock.put(posLong, state.getBlock());
 								}
 							}
 						}
@@ -100,7 +101,7 @@ public final class XrayRenderer {
 			if (visited.contains(startLong)) {
 				continue;
 			}
-			int startOreType = positionToOreType.get(startLong);
+			Block startBlock = positionToBlock.get(startLong);
 
 			List<VoxelShape> blockShapes = new ArrayList<>();
 			List<Long> groupBlocks = new ArrayList<>();
@@ -131,7 +132,7 @@ public final class XrayRenderer {
 				for (int[] offset : NEIGHBORS) {
 					long neighbor = BlockPos.asLong(pos.getX() + offset[0], pos.getY() + offset[1], pos.getZ() + offset[2]);
 					if (orePositions.contains(neighbor) && !visited.contains(neighbor)) {
-						if (positionToOreType.get(neighbor) == startOreType) {
+						if (positionToBlock.get(neighbor) == startBlock) {
 							visited.add(neighbor);
 							queue.add(neighbor);
 						}
@@ -148,7 +149,7 @@ public final class XrayRenderer {
 				merged = Shapes.joinUnoptimized(merged, blockShapes.get(i), net.minecraft.world.phys.shapes.BooleanOp.OR);
 			}
 
-			int color = XrayModule.getOreColorByType(startOreType);
+			int color = XrayModule.getBlockColor(startBlock);
 			collector.submitShapeOutline(poseStack, merged, XrayRenderType.XRAY, color, 2.0f, true);
 		}
 	}

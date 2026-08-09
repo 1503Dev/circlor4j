@@ -106,6 +106,26 @@ public final class StatusManager {
 		return this.getBoolean(path, false);
 	}
 
+	public boolean contains(String path) {
+		return this.store.containsKey(path);
+	}
+
+	public void remove(String path) {
+		if (this.store.remove(path) != null && this.listener != null) {
+			this.listener.onValueChange(path, 0.0);
+		}
+	}
+
+	public Map<String, Double> entriesWithPrefix(String prefix) {
+		Map<String, Double> result = new HashMap<>();
+		for (Map.Entry<String, Double> entry : this.store.entrySet()) {
+			if (entry.getKey().startsWith(prefix)) {
+				result.put(entry.getKey(), entry.getValue());
+			}
+		}
+		return result;
+	}
+
 	public float getFloat(String path, float defaultValue) {
 		return (float) this.getDouble(path, defaultValue);
 	}
