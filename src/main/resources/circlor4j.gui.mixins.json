@@ -14,6 +14,8 @@
 		"EntityMixin",
 		"KeyboardInputMixin",
 		"LivingEntityMixin",
+		"NoJumpDelayLocalPlayerMixin",
+		"LivingEntityAccessor",
 		"TimerDeltaTrackerMixin",
 		"WebBlockMixin"
 	],

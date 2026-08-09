@@ -29,6 +29,7 @@ import dev1503.circlor4j.client.module.modules.NoFallModule;
 import dev1503.circlor4j.client.module.modules.NoSlowDownModule;
 import dev1503.circlor4j.client.module.modules.NoWebModule;
 import dev1503.circlor4j.client.module.modules.NukerModule;
+import dev1503.circlor4j.client.module.modules.NoJumpDelayModule;
 import dev1503.circlor4j.client.module.modules.ReachModule;
 import dev1503.circlor4j.client.module.modules.ScaffoldModule;
 import dev1503.circlor4j.client.module.modules.SpeedModule;
@@ -98,6 +99,7 @@ public final class Circlor4jClient {
 		ModuleManager.register(new NoSlowDownModule(status));
 		ModuleManager.register(new NoWebModule(status));
 		ModuleManager.register(new NukerModule(status));
+		ModuleManager.register(new NoJumpDelayModule(status));
 		ModuleManager.register(new ReachModule(status));
 		ModuleManager.register(new ScaffoldModule(status));
 		ModuleManager.register(new SpeedModule(status));
