@@ -5,8 +5,10 @@ import dev1503.circlor4j.client.module.ModuleManager;
 import dev1503.circlor4j.client.module.modules.AutoClickerModule;
 import dev1503.circlor4j.client.module.modules.AimBotModule;
 import dev1503.circlor4j.client.module.modules.AntiDebuffModule;
+import dev1503.circlor4j.client.module.modules.AntiKnockbackModule;
 import dev1503.circlor4j.client.module.modules.ArraylistModule;
 import dev1503.circlor4j.client.module.modules.AutoClickerModule;
+import dev1503.circlor4j.client.module.modules.AutoTotemModule;
 import dev1503.circlor4j.client.module.modules.AutoSprintModule;
 import dev1503.circlor4j.client.module.modules.AirJumpModule;
 import dev1503.circlor4j.client.module.modules.AntiKnockbackModule;
@@ -84,6 +86,7 @@ public final class Circlor4jClient {
 		ModuleManager.register(new AimBotModule(status));
 		ModuleManager.register(new AntiKnockbackModule(status));
 		ModuleManager.register(new AutoClickerModule(status));
+		ModuleManager.register(new AutoTotemModule(status));
 		ModuleManager.register(new AutoSprintModule(status));
 		ModuleManager.register(new ClickGuiModule(status));
 		ModuleManager.register(new CriticalsModule(status));
