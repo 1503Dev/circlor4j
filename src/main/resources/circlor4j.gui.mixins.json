@@ -14,6 +14,7 @@
 		"EagleKeyboardInputMixin",
 		"EntityMixin",
 		"KeyboardInputMixin",
+		"NameTagRendererMixin",
 		"LivingEntityMixin",
 		"NoJumpDelayLocalPlayerMixin",
 		"AntiDebuffMobEffectMixin",

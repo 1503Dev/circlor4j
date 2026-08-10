@@ -28,6 +28,7 @@ import dev1503.circlor4j.client.module.modules.HighJumpModule;
 import dev1503.circlor4j.client.module.modules.InventoryMoveModule;
 import dev1503.circlor4j.client.module.modules.ItemTagModule;
 import dev1503.circlor4j.client.module.modules.JetpackModule;
+import dev1503.circlor4j.client.module.modules.NameTagModule;
 import dev1503.circlor4j.client.module.modules.KillAuraModule;
 import dev1503.circlor4j.client.module.modules.LanguageModule;
 import dev1503.circlor4j.client.module.modules.NoCameraClipModule;
@@ -104,6 +105,7 @@ public final class Circlor4jClient {
 		ModuleManager.register(new InventoryMoveModule(status));
 		ModuleManager.register(new ItemTagModule(status));
 		ModuleManager.register(new JetpackModule(status));
+		ModuleManager.register(new NameTagModule(status));
 		ModuleManager.register(new KillAuraModule(status));
 		ModuleManager.register(new LanguageModule(status));
 		ModuleManager.register(new LowFireModule(status));
