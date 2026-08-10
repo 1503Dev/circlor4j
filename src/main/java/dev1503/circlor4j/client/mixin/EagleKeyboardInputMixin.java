@@ -22,21 +22,25 @@ public abstract class EagleKeyboardInputMixin {
 			return;
 		}
 
+		Input keyPresses = clientInput().keyPresses;
+		boolean forward = keyPresses.forward();
+		boolean backward = keyPresses.backward();
+		boolean left = keyPresses.left();
+		boolean right = keyPresses.right();
+
 		boolean originalSneak = mc.options.keyShift.isDown();
-		boolean conditionsMet = mc.player.onGround();
-		boolean isActive = EagleModule.shouldActivateEagle(mc.player);
+		boolean conditionsMet = EagleModule.conditionsMet(mc.player, originalSneak, forward, backward, left, right);
+		boolean isActive = EagleModule.shouldActivateEagle(mc.player, conditionsMet, forward, backward, left, right);
 
 		EagleModule.updateSneakCapture(originalSneak, isActive);
 		boolean controlsSneak = EagleModule.shouldOverrideSneak(conditionsMet, isActive);
 
 		boolean newSneak = controlsSneak ? isActive : (originalSneak || isActive);
 
-		if (newSneak != clientInput().keyPresses.shift()) {
-			Input current = clientInput().keyPresses;
+		if (newSneak != keyPresses.shift()) {
 			clientInput().keyPresses = new Input(
-				current.forward(), current.backward(),
-				current.left(), current.right(),
-				current.jump(), newSneak, current.sprint()
+				forward, backward, left, right,
+				keyPresses.jump(), newSneak, keyPresses.sprint()
 			);
 		}
 

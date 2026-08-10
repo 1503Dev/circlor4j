@@ -16,10 +16,6 @@ public abstract class FlyLocalPlayerMixin {
 	private void onAiStep(CallbackInfo ci) {
 		LocalPlayer player = (LocalPlayer) (Object) this;
 		if (!FlyModule.isActive()) {
-			if (player.getAbilities().flying || player.getAbilities().mayfly) {
-				player.getAbilities().flying = false;
-				player.getAbilities().mayfly = false;
-			}
 			return;
 		}
 		if (FlyModule.isVanillaFlyMode()) {

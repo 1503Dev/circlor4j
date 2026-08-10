@@ -26,7 +26,6 @@ public class FlyModule extends Module {
 		net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
 		if (mc.player != null) {
 			mc.player.getAbilities().flying = false;
-			mc.player.getAbilities().mayfly = false;
 		}
 	}
 
