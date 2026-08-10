@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
@@ -177,6 +178,14 @@ public class ClickGuiScreen extends Screen {
 				}
 			}
 		}
+
+		String version = FabricLoader.getInstance()
+			.getModContainer("circlor4j")
+			.map(c -> c.getMetadata().getVersion().getFriendlyString())
+			.orElse("unknown");
+		String versionText = "Circlor4J v" + version;
+		int versionWidth = UiText.scaledWidth(this.font, versionText);
+		UiText.scaledText(graphics, this.font, versionText, this.width / 2 - versionWidth / 2, this.height - 16, 0xFFAAAAAA);
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package dev1503.circlor4j.client.keybind;
 
+import com.google.gson.annotations.SerializedName;
 import com.mojang.blaze3d.platform.InputConstants;
 import java.util.Locale;
 
@@ -7,12 +8,19 @@ import java.util.Locale;
 public class KeyBind {
 	public enum Mode { TOGGLE, HOLD }
 
+	@SerializedName("key")
 	private InputConstants.Key key;
+	@SerializedName("shift")
 	private boolean shift;
+	@SerializedName("ctrl")
 	private boolean ctrl;
+	@SerializedName("alt")
 	private boolean alt;
+	@SerializedName("function")
 	private String function;
+	@SerializedName("mode")
 	private Mode mode;
+	@SerializedName("down")
 	private boolean down;
 
 	public KeyBind(InputConstants.Key key, boolean shift, boolean ctrl, boolean alt, String function, Mode mode) {
@@ -108,7 +116,19 @@ public class KeyBind {
 	}
 
 	/** Serialization form. */
-	public record Data(String key, boolean shift, boolean ctrl, boolean alt, String function, String mode) {
+	public record Data(
+			@SerializedName("key")
+			String key,
+			@SerializedName("shift")
+			boolean shift,
+			@SerializedName("ctrl")
+			boolean ctrl,
+			@SerializedName("alt")
+			boolean alt,
+			@SerializedName("function")
+			String function,
+			@SerializedName("mode")
+			String mode) {
 	}
 
 	public Data toData() {

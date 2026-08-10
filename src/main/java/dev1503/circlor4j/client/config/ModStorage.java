@@ -3,6 +3,7 @@ package dev1503.circlor4j.client.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
+import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import dev1503.circlor4j.client.keybind.KeyBind;
 import java.io.IOException;
@@ -21,7 +22,19 @@ public final class ModStorage {
 	private static final Type MAP_STRING_LAYOUT = new TypeToken<LinkedHashMap<String, WindowLayout>>() {}.getType();
 	private static final Type LIST_KEYBIND_DATA = new TypeToken<List<KeyBind.Data>>() {}.getType();
 
-	public record WindowLayout(int x, int y, int width, int height, boolean collapsed, List<String> expanded) {
+	public record WindowLayout(
+			@SerializedName("x")
+			int x,
+			@SerializedName("y")
+			int y,
+			@SerializedName("width")
+			int width,
+			@SerializedName("height")
+			int height,
+			@SerializedName("collapsed")
+			boolean collapsed,
+			@SerializedName("expanded")
+			List<String> expanded) {
 		public WindowLayout(int x, int y, int width, int height, boolean collapsed) {
 			this(x, y, width, height, collapsed, null);
 		}
