@@ -53,7 +53,7 @@ public class ClickGuiScreen extends Screen {
 					window.getX(),
 					window.getY(),
 					window.getWidth(),
-					window.getHeight(),
+					window.getContentHeight(),
 					window.isCollapsed(),
 					window.getExpandedPaths()
 				)
@@ -122,7 +122,7 @@ public class ClickGuiScreen extends Screen {
 					window.getX(),
 					window.getY(),
 					window.getWidth(),
-					window.getHeight(),
+					window.getContentHeight(),
 					window.isCollapsed(),
 					window.getExpandedPaths()
 				)

@@ -12,10 +12,10 @@ import net.minecraft.client.input.MouseButtonEvent;
  * Supports a step, minimum, maximum and a default value (read from the StatusManager store).
  */
 public class Slider extends Component {
-	private static final int SLIDER_WIDTH = 38;
 	private static final int TRACK_HEIGHT = 2;
-	private static final int THUMB_WIDTH = TRACK_HEIGHT;
+	private static final int THUMB_WIDTH = 2;
 	private static final int RIGHT_INSET = 3;
+	private static final int LEFT_INSET = 2;
 
 	private static final int TRACK_COLOR = 0xFF555555;
 	private static final int THUMB_COLOR = 0xFFCCCCCC;
@@ -91,16 +91,20 @@ public class Slider extends Component {
 		this.width = width;
 	}
 
-	private int sliderRight() {
+	private int trackRight() {
 		return this.x + this.width - RIGHT_INSET;
 	}
 
-	private int sliderStart() {
-		return this.sliderRight() - SLIDER_WIDTH;
+	private int trackStart() {
+		return this.x + LEFT_INSET;
+	}
+
+	private int trackWidth() {
+		return this.trackRight() - this.trackStart();
 	}
 
 	private boolean inTrack(int mx, int my) {
-		return mx >= this.sliderStart() && mx < this.sliderRight() && my >= this.y && my < this.y + this.height;
+		return mx >= this.trackStart() && mx < this.trackRight() && my >= this.y && my < this.y + this.height;
 	}
 
 	public boolean mouseClicked(MouseButtonEvent event) {
@@ -132,7 +136,7 @@ public class Slider extends Component {
 	}
 
 	private void updateFromMouse(int mx) {
-		double t = (mx - this.sliderStart()) / (double) SLIDER_WIDTH;
+		double t = (mx - this.trackStart()) / (double) this.trackWidth();
 		t = Math.max(0.0, Math.min(1.0, t));
 		double v = this.min + t * (this.max - this.min);
 		v = this.min + Math.round((v - this.min) / this.step) * this.step;
@@ -161,21 +165,23 @@ public class Slider extends Component {
 	}
 
 	public void render(GuiGraphicsExtractor graphics, Font font, int mouseX, int mouseY) {
+		int halfHeight = this.height / 2;
+
 		String valueText = this.formatValue();
 		int valueWidth = UiText.scaledWidth(font, valueText);
-		int valueX = this.sliderStart() - 2 - valueWidth;
-		int labelMax = Math.max(0, valueX - (this.x + 2) - 2);
+		int valueX = this.x + this.width - RIGHT_INSET - valueWidth;
+		int labelMax = Math.max(0, valueX - (this.x + LEFT_INSET) - 2);
 		String labelText = UiText.fit(font, this.label, labelMax);
-		int textY = UiText.centerY(this.y, this.height);
-		UiText.scaledText(graphics, font, labelText, this.x + 2, textY, LABEL_COLOR);
+		int textY = this.y + Math.max(1, (halfHeight - 5) / 2);
+		UiText.scaledText(graphics, font, labelText, this.x + LEFT_INSET, textY, LABEL_COLOR);
 		UiText.scaledText(graphics, font, valueText, valueX, textY, VALUE_COLOR);
 
-		int trackY = this.y + (this.height - TRACK_HEIGHT) / 2;
-		graphics.fill(this.sliderStart(), trackY, this.sliderRight(), trackY + TRACK_HEIGHT, TRACK_COLOR);
+		int trackY = this.y + halfHeight + (halfHeight - TRACK_HEIGHT) / 2;
+		graphics.fill(this.trackStart(), trackY, this.trackRight(), trackY + TRACK_HEIGHT, TRACK_COLOR);
 
 		double t = (this.value - this.min) / (this.max - this.min);
-		int thumbCenter = this.sliderStart() + (int) Math.round(t * SLIDER_WIDTH);
-		int thumbLeft = Math.max(this.sliderStart(), Math.min(this.sliderRight() - THUMB_WIDTH, thumbCenter - THUMB_WIDTH / 2));
+		int thumbCenter = this.trackStart() + (int) Math.round(t * this.trackWidth());
+		int thumbLeft = Math.max(this.trackStart(), Math.min(this.trackRight() - THUMB_WIDTH, thumbCenter - THUMB_WIDTH / 2));
 		graphics.fill(thumbLeft, trackY, thumbLeft + THUMB_WIDTH, trackY + TRACK_HEIGHT, THUMB_COLOR);
 	}
 }

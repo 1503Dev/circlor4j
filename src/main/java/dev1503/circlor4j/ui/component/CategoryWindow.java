@@ -97,10 +97,10 @@ public class CategoryWindow {
 			}
 			Toggle toggle = new Toggle(status, module.getEnabledPath(), module.getName(), x, y, WIDTH, ROW_HEIGHT);
 			for (Module.Setting setting : module.getSettings()) {
-				if (setting instanceof Module.DoubleSetting s) {
-					Slider slider = new Slider(
-						status, s.path(), tr(s.labelKey(), s.labelFallback()), s.min(), s.max(), s.step(), x, y, WIDTH, ROW_HEIGHT
-					);
+			if (setting instanceof Module.DoubleSetting s) {
+				Slider slider = new Slider(
+					status, s.path(), tr(s.labelKey(), s.labelFallback()), s.min(), s.max(), s.step(), x, y, WIDTH, ROW_HEIGHT * 2
+				);
 					slider.setShowCondition(s.showCondition());
 					slider.setHideCondition(s.hideCondition());
 					if (s.parentOption() != null) {
@@ -113,11 +113,11 @@ public class CategoryWindow {
 					} else {
 						toggle.addChild(slider);
 					}
-				} else if (setting instanceof Module.RangeSetting s) {
-					RangeSlider range = new RangeSlider(
-						status, s.minPath(), s.maxPath(), tr(s.labelKey(), s.labelFallback()), s.min(), s.max(), s.step(),
-						s.defaultMin(), s.defaultMax(), x, y, WIDTH, ROW_HEIGHT
-					);
+			} else if (setting instanceof Module.RangeSetting s) {
+				RangeSlider range = new RangeSlider(
+					status, s.minPath(), s.maxPath(), tr(s.labelKey(), s.labelFallback()), s.min(), s.max(), s.step(),
+					s.defaultMin(), s.defaultMax(), x, y, WIDTH, ROW_HEIGHT * 2
+				);
 					toggle.addChild(range);
 				} else if (setting instanceof Module.DropdownSetting s) {
 					String[] items = new String[s.itemKeys().length];
@@ -447,6 +447,10 @@ public class CategoryWindow {
 		return this.collapsed ? HEADER_HEIGHT : this.height;
 	}
 
+	public int getContentHeight() {
+		return this.height;
+	}
+
 	public boolean isCollapsed() {
 		return this.collapsed;
 	}
@@ -477,6 +481,32 @@ public class CategoryWindow {
 
 	private int contentHeight() {
 		return this.getHeight() - HEADER_HEIGHT - BOTTOM_PADDING;
+	}
+
+	private static int rowHeight(StatusWidget row) {
+		if (row instanceof Slider slider) {
+			return slider.getHeight();
+		}
+		if (row instanceof RangeSlider range) {
+			return range.getHeight();
+		}
+		return ROW_HEIGHT;
+	}
+
+	private int totalContentHeight() {
+		int h = 0;
+		for (StatusWidget row : this.rows) {
+			h += rowHeight(row);
+		}
+		return h;
+	}
+
+	private int rowYOffset(int rowIndex) {
+		int y = 0;
+		for (int i = 0; i < rowIndex && i < this.rows.size(); i++) {
+			y += rowHeight(this.rows.get(i));
+		}
+		return y;
 	}
 
 	private void rebuildRows() {
@@ -514,8 +544,8 @@ public class CategoryWindow {
 	/** Draws group borders for this toggle and, recursively, any expanded nested sub-toggles. */
 	private void drawExpandedBorders(Toggle toggle, GuiGraphicsExtractor graphics) {
 		if (toggle.isExpanded()) {
-			int blockHeight = (toggle.getGroupEnd() - toggle.getGroupStart()) * ROW_HEIGHT;
-			int topY = this.y + HEADER_HEIGHT + (toggle.getGroupStart() - this.scroll) * ROW_HEIGHT;
+			int blockHeight = this.rowYOffset(toggle.getGroupEnd()) - this.rowYOffset(toggle.getGroupStart());
+			int topY = this.y + HEADER_HEIGHT + this.rowYOffset(Math.max(toggle.getGroupStart(), this.scroll)) - this.rowYOffset(this.scroll);
 			drawBorder(
 				graphics,
 				this.x,
@@ -533,19 +563,40 @@ public class CategoryWindow {
 	}
 
 	private int visibleRows() {
-		int byHeight = Math.max(0, this.contentHeight() / ROW_HEIGHT);
-		return Math.min(this.rows.size() - this.scroll, byHeight);
+		int remaining = this.contentHeight();
+		int count = 0;
+		for (int i = this.scroll; i < this.rows.size(); i++) {
+			int h = rowHeight(this.rows.get(i));
+			if (h > remaining) {
+				break;
+			}
+			remaining -= h;
+			count++;
+		}
+		return count;
 	}
 
 	private int maxScroll() {
-		int byHeight = Math.max(1, this.contentHeight() / ROW_HEIGHT);
-		return Math.max(0, this.rows.size() - byHeight);
+		int contentH = this.contentHeight();
+		int total = this.totalContentHeight();
+		if (total <= contentH) {
+			return 0;
+		}
+		int scroll = 0;
+		for (int i = 0; i < this.rows.size(); i++) {
+			if (total - this.rowYOffset(i) <= contentH) {
+				break;
+			}
+			scroll++;
+		}
+		return scroll;
 	}
 
 	private void layoutVisibleRows() {
+		int scrollOffset = this.rowYOffset(this.scroll);
 		for (int i = 0; i < this.visibleRows(); i++) {
 			StatusWidget row = this.rows.get(this.scroll + i);
-			int rowY = this.y + HEADER_HEIGHT + i * ROW_HEIGHT;
+			int rowY = this.y + HEADER_HEIGHT + this.rowYOffset(this.scroll + i) - scrollOffset;
 			int indent = this.rowIndent.get(this.scroll + i);
 			int rowX = this.x + indent;
 			int rowWidth = this.width - indent;
@@ -691,8 +742,9 @@ public class CategoryWindow {
 		graphics.disableScissor();
 
 		int contentH = this.contentHeight();
-		if (this.rows.size() * ROW_HEIGHT > contentH) {
-			int thumbHeight = Math.max(8, contentH * contentH / (this.rows.size() * ROW_HEIGHT));
+		int totalH = this.totalContentHeight();
+		if (totalH > contentH) {
+			int thumbHeight = Math.max(8, contentH * contentH / totalH);
 			int thumbY = this.y + HEADER_HEIGHT + (contentH - thumbHeight) * this.scroll / Math.max(1, this.maxScroll());
 			graphics.fill(this.x + this.width - 2, thumbY, this.x + this.width, thumbY + thumbHeight, SCROLLBAR_COLOR);
 		}
@@ -829,7 +881,7 @@ public class CategoryWindow {
 			return false;
 		}
 		this.closeMenus();
-		if (this.collapsed || this.rows.size() * ROW_HEIGHT <= this.contentHeight()) {
+		if (this.collapsed || this.totalContentHeight() <= this.contentHeight()) {
 			return true;
 		}
 		if (scrollDelta > 0.0) {

@@ -13,10 +13,10 @@ import net.minecraft.client.input.MouseButtonEvent;
  * "{id}/{option}/min" and "{id}/{option}/max" paths.
  */
 public class RangeSlider extends Component {
-	private static final int RANGE_TRACK_WIDTH = 38;
 	private static final int TRACK_HEIGHT = 2;
 	private static final int THUMB_WIDTH = 2;
 	private static final int RIGHT_INSET = 3;
+	private static final int LEFT_INSET = 2;
 	private static final int GRAB_DISTANCE = 3;
 
 	private static final int TRACK_COLOR = 0xFF555555;
@@ -78,6 +78,10 @@ public class RangeSlider extends Component {
 		this.valueMax = this.clamp(this.status.getDouble(this.maxPath, this.max));
 	}
 
+	public int getHeight() {
+		return this.height;
+	}
+
 	public void setPosition(int x, int y) {
 		this.x = x;
 		this.y = y;
@@ -92,11 +96,11 @@ public class RangeSlider extends Component {
 	}
 
 	private int trackStart() {
-		return this.trackRight() - RANGE_TRACK_WIDTH;
+		return this.x + LEFT_INSET;
 	}
 
 	private int trackLength() {
-		return RANGE_TRACK_WIDTH - THUMB_WIDTH;
+		return this.trackRight() - this.trackStart() - THUMB_WIDTH;
 	}
 
 	private double clamp(double v) {
@@ -166,16 +170,28 @@ public class RangeSlider extends Component {
 	private void updateFromMouse(int mx) {
 		double v = this.clamp(this.xToValue(mx));
 		if (this.dragging == DragThumb.MIN) {
-			double lo = Math.min(v, this.valueMax);
-			if (lo != this.valueMin) {
-				this.valueMin = lo;
-				this.status.setValue(this, this.minPath, lo);
+			if (v > this.valueMax) {
+				this.dragging = DragThumb.MAX;
+				double newMin = this.valueMax;
+				this.valueMax = v;
+				this.valueMin = newMin;
+				this.status.setValue(this, this.minPath, newMin);
+				this.status.setValue(this, this.maxPath, v);
+			} else if (v != this.valueMin) {
+				this.valueMin = v;
+				this.status.setValue(this, this.minPath, v);
 			}
 		} else if (this.dragging == DragThumb.MAX) {
-			double hi = Math.max(v, this.valueMin);
-			if (hi != this.valueMax) {
-				this.valueMax = hi;
-				this.status.setValue(this, this.maxPath, hi);
+			if (v < this.valueMin) {
+				this.dragging = DragThumb.MIN;
+				double newMax = this.valueMin;
+				this.valueMin = v;
+				this.valueMax = newMax;
+				this.status.setValue(this, this.minPath, v);
+				this.status.setValue(this, this.maxPath, newMax);
+			} else if (v != this.valueMax) {
+				this.valueMax = v;
+				this.status.setValue(this, this.maxPath, v);
 			}
 		}
 	}
@@ -184,16 +200,18 @@ public class RangeSlider extends Component {
 		this.valueMin = this.clamp(this.status.getDouble(this.minPath, this.min));
 		this.valueMax = this.clamp(this.status.getDouble(this.maxPath, this.max));
 
+		int halfHeight = this.height / 2;
+
 		String valueText = format(this.valueMin) + ".." + format(this.valueMax);
 		int valueWidth = UiText.scaledWidth(font, valueText);
-		int valueX = this.trackStart() - 2 - valueWidth;
-		int labelMax = Math.max(0, valueX - (this.x + 2) - 2);
+		int valueX = this.x + this.width - RIGHT_INSET - valueWidth;
+		int labelMax = Math.max(0, valueX - (this.x + LEFT_INSET) - 2);
 		String labelText = UiText.fit(font, this.label, labelMax);
-		int textY = UiText.centerY(this.y, this.height);
-		UiText.scaledText(graphics, font, labelText, this.x + 2, textY, LABEL_COLOR);
+		int textY = this.y + Math.max(1, (halfHeight - 5) / 2);
+		UiText.scaledText(graphics, font, labelText, this.x + LEFT_INSET, textY, LABEL_COLOR);
 		UiText.scaledText(graphics, font, valueText, valueX, textY, VALUE_COLOR);
 
-		int trackY = this.y + (this.height - TRACK_HEIGHT) / 2;
+		int trackY = this.y + halfHeight + (halfHeight - TRACK_HEIGHT) / 2;
 		graphics.fill(this.trackStart(), trackY, this.trackRight(), trackY + TRACK_HEIGHT, TRACK_COLOR);
 
 		int minX = Math.max(this.trackStart(), Math.min(this.trackRight() - THUMB_WIDTH, this.valueToX(this.valueMin)));
