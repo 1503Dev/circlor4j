@@ -38,6 +38,9 @@ public final class ItemTagRenderer {
 		int screenWidth = mc.getWindow().getGuiScaledWidth();
 		int screenHeight = mc.getWindow().getGuiScaledHeight();
 
+		float baseScale = ItemTagModule.getTextSize();
+		boolean scaleByDistance = ItemTagModule.isScaleByDistance();
+
 		for (net.minecraft.world.entity.Entity entity : level.entitiesForRendering()) {
 			if (!(entity instanceof ItemEntity itemEntity)) {
 				continue;
@@ -49,10 +52,23 @@ public final class ItemTagRenderer {
 			}
 			ItemStack stack = itemEntity.getItem();
 			String text = stack.getHoverName().getString() + " x" + stack.getCount();
+
+			float scale = baseScale;
+			if (scaleByDistance) {
+				double dist = cameraPos.distanceTo(worldPos);
+				scale = (float) Math.max(0.5, baseScale * (1.0 / Math.max(1.0, dist / 8.0)));
+			}
+
 			int textWidth = mc.font.width(text);
-			float x = (float) screen.x - textWidth / 2.0F;
+			float x = (float) screen.x - textWidth / 2.0F * scale;
 			float y = (float) screen.y;
+
+			graphics.pose().pushMatrix();
+			graphics.pose().translate(x, y);
+			graphics.pose().scale(scale, scale);
+			graphics.pose().translate(-x, -y);
 			graphics.text(mc.font, text, (int) x, (int) y, 0xFFFFFFFF);
+			graphics.pose().popMatrix();
 		}
 	}
 
