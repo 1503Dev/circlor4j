@@ -11,6 +11,7 @@
 		"LocalPlayerMixin",
 		"CameraMixin",
 		"ClientInputMixin",
+		"EagleKeyboardInputMixin",
 		"EntityMixin",
 		"KeyboardInputMixin",
 		"LivingEntityMixin",
