@@ -26,6 +26,7 @@ import dev1503.circlor4j.client.module.modules.FreelookModule;
 import dev1503.circlor4j.client.module.modules.HitboxModule;
 import dev1503.circlor4j.client.module.modules.HighJumpModule;
 import dev1503.circlor4j.client.module.modules.InventoryMoveModule;
+import dev1503.circlor4j.client.module.modules.ItemTagModule;
 import dev1503.circlor4j.client.module.modules.JetpackModule;
 import dev1503.circlor4j.client.module.modules.KillAuraModule;
 import dev1503.circlor4j.client.module.modules.LanguageModule;
@@ -101,6 +102,7 @@ public final class Circlor4jClient {
 		ModuleManager.register(new HitboxModule(status));
 		ModuleManager.register(new HighJumpModule(status));
 		ModuleManager.register(new InventoryMoveModule(status));
+		ModuleManager.register(new ItemTagModule(status));
 		ModuleManager.register(new JetpackModule(status));
 		ModuleManager.register(new KillAuraModule(status));
 		ModuleManager.register(new LanguageModule(status));

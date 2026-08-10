@@ -1,5 +1,6 @@
 package dev1503.circlor4j.client.mixin;
 
+import dev1503.circlor4j.client.render.ItemTagRenderer;
 import dev1503.circlor4j.client.render.TracerRenderer;
 import dev1503.circlor4j.ui.horionarraylist.HorionArrayList;
 import net.minecraft.client.DeltaTracker;
@@ -17,6 +18,7 @@ public abstract class HudMixin {
 	@Inject(method = "extractRenderState", at = @At("TAIL"))
 	private void circlor4jOverlays(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
 		TracerRenderer.render(graphics);
+		ItemTagRenderer.render(graphics);
 		HorionArrayList.render(graphics);
 	}
 }

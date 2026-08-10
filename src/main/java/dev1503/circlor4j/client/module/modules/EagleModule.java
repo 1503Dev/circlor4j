@@ -57,7 +57,7 @@ public class EagleModule extends Module {
 
 		BlockPos below = BlockPos.containing(pos.x, pos.y - 0.1, pos.z);
 		if (!player.level().getBlockState(below).isSolidRender()) {
-			return false;
+			return true;
 		}
 
 		double localX = pos.x - below.getX();

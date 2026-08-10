@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev1503.circlor4j.client.module.modules.EspModule;
 import dev1503.circlor4j.client.module.modules.XrayModule;
 import dev1503.circlor4j.client.render.EspRenderType;
+import dev1503.circlor4j.client.render.ItemTagRenderer;
 import dev1503.circlor4j.client.render.TracerRenderer;
 import dev1503.circlor4j.client.render.XrayRenderer;
 import net.minecraft.client.Minecraft;
@@ -36,6 +37,7 @@ public abstract class LevelRendererMixin {
 	) {
 		Minecraft minecraft = Minecraft.getInstance();
 		TracerRenderer.capture(levelRenderState.cameraRenderState);
+		ItemTagRenderer.capture(levelRenderState.cameraRenderState);
 		ClientLevel level = minecraft.level;
 		if (level == null) {
 			return;
