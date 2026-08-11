@@ -3,8 +3,8 @@
 # Fabric Mixin Mod - Obfuscation Configuration
 # ============================================================
 
--injars 'D:\1\projects\circlor4j\build\libs\circlor4j-26.2.0.1.jar'
--outjars 'D:\1\projects\circlor4j\build\libs\circlor4j-26.2.0.1-proguarded.jar'
+-injars 'D:\1\projects\circlor4j\build\libs\circlor4j-26.2.0.2.jar'
+-outjars 'D:\1\projects\circlor4j\build\libs\circlor4j-26.2.0.2-proguarded.jar'
 
 -libraryjars 'D:\1\projects\circlor4j\libs\minecraft.jar'
 -libraryjars 'C:\Program Files\Java\jdk-25.0.4.7-hotspot\lib\jrt-fs.jar'

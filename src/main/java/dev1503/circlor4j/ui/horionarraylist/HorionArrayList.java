@@ -30,7 +30,7 @@ public final class HorionArrayList {
 	private static final int MODE_TEXT_COLOR = 0xFFC5C5C5;
 	private static final float RAINBOW_STEP = 8.0F;
 	private static final float HUE_SPEED = 0.04F;
-	private static final float SLIDE_DURATION = 400.0F;
+	private static final float SLIDE_DURATION = 150.0F;
 	private static final float EXIT_DURATION = 475.0F;
 	private static final float LAYOUT_SMOOTH_RATE = 10.0F;
 	private static final float GRAVITY_SLIDE_DURATION = 300.0F;

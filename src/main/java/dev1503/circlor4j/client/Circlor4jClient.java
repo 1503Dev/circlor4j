@@ -1,6 +1,7 @@
 package dev1503.circlor4j.client;
 
 import dev1503.circlor4j.client.keybind.KeyBindManager;
+import dev1503.circlor4j.client.update.UpdateChecker;
 import dev1503.circlor4j.client.module.ModuleManager;
 import dev1503.circlor4j.client.module.modules.AutoClickerModule;
 import dev1503.circlor4j.client.module.modules.AimBotModule;
@@ -52,6 +53,7 @@ import dev1503.circlor4j.ui.clickgui.ClickGuiScreen;
 import dev1503.circlor4j.ui.component.CategoryWindow;
 import dev1503.circlor4j.ui.screen.KeyBindScreen;
 import net.minecraft.client.Minecraft;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screens.Screen;
 
 /**
@@ -130,5 +132,11 @@ public final class Circlor4jClient {
 		ModuleManager.register(new ZoomModule(status));
 
 		KeyBindManager.init();
+
+		String version = FabricLoader.getInstance()
+			.getModContainer("circlor4j")
+			.map(c -> c.getMetadata().getVersion().getFriendlyString())
+			.orElse("unknown");
+		UpdateChecker.checkForUpdates(version);
 	}
 }

@@ -3,6 +3,7 @@ package dev1503.circlor4j.ui.clickgui;
 import dev1503.circlor4j.client.config.ModStorage;
 import dev1503.circlor4j.client.module.ModuleCategory;
 import dev1503.circlor4j.client.module.modules.ClickGuiModule;
+import dev1503.circlor4j.client.update.UpdateChecker;
 import dev1503.circlor4j.i18n.I18n;
 import dev1503.circlor4j.ui.StatusManager;
 import dev1503.circlor4j.ui.component.BlockList;
@@ -12,11 +13,14 @@ import dev1503.circlor4j.ui.component.ColorPicker;
 import dev1503.circlor4j.ui.component.Dropdown;
 import dev1503.circlor4j.ui.component.Slider;
 import dev1503.circlor4j.ui.component.UiText;
+import java.awt.Desktop;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
@@ -33,6 +37,7 @@ public class ClickGuiScreen extends Screen {
 	private String renderedLang;
 	private int lastMouseX;
 	private int lastMouseY;
+	private Button updateButton;
 
 	public ClickGuiScreen() {
 		super(Component.literal("Circlor4J ClickGUI"));
@@ -42,6 +47,12 @@ public class ClickGuiScreen extends Screen {
 	protected void init() {
 		super.init();
 		this.buildWindows(ModStorage.loadLayout());
+		Button tmp = Button.builder(
+			Component.literal(I18n.t("clickgui.update_available", "New version is ready")),
+			btn -> this.openUpdateUrl()
+		).bounds(0, 0, 10, 10).build();
+		this.updateButton = tmp;
+		this.addRenderableWidget(this.updateButton);
 	}
 
 	/** Rebuilds all category windows (re-resolving localisation) when the language changes. */
@@ -186,13 +197,47 @@ public class ClickGuiScreen extends Screen {
 		String versionText = "Circlor4J v" + version;
 		int versionWidth = UiText.scaledWidth(this.font, versionText);
 		UiText.scaledText(graphics, this.font, versionText, this.width / 2 - versionWidth / 2, this.height - 16, 0xFFAAAAAA);
+
+		String updateText = I18n.t("clickgui.update_available", "New version is ready");
+		int textW = this.font.width(updateText);
+		int textH = this.font.lineHeight;
+		int padding = 2;
+		int boxW = textW + padding * 2;
+		int boxH = textH + padding * 2;
+		int boxX = this.width - boxW - 4;
+		int boxY = this.height - boxH - 6;
+		this.updateButton.setX(boxX);
+		this.updateButton.setY(boxY);
+		this.updateButton.setWidth(boxW);
+		this.updateButton.setHeight(boxH);
+		if (UpdateChecker.hasUpdate()) {
+			graphics.fill(boxX, boxY, boxX + boxW, boxY + boxH, 0x33FFFFFF);
+			graphics.text(this.font, updateText, boxX + padding, boxY + padding, 0xFFFFAA00);
+		}
 	}
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		int mx = (int) event.x();
 		int my = (int) event.y();
-		if (this.activePicker != null) {			if (this.activePicker.mouseClickedWindow(event, this.font)) {
+		if (this.updateButton != null && UpdateChecker.hasUpdate()) {
+			String updateText = I18n.t("clickgui.update_available", "New version is ready");
+			int textW = this.font.width(updateText);
+			int textH = this.font.lineHeight;
+			int padding = 2;
+			int boxW = textW + padding * 2;
+			int boxH = textH + padding * 2;
+			int boxX = this.width - boxW - 4;
+			int boxY = this.height - boxH - 6;
+//			System.out.println("[Circlor4J] click check: mx=" + mx + " my=" + my + " boxX=" + boxX + " boxY=" + boxY + " boxW=" + boxW + " boxH=" + boxH + " hasUpdate=" + UpdateChecker.hasUpdate());
+			if (mx >= boxX && mx <= boxX + boxW && my >= boxY && my <= boxY + boxH) {
+				System.out.println("[Circlor4J] Update box hit!");
+				this.openUpdateUrl();
+				return true;
+			}
+		}
+		if (this.activePicker != null) {
+			if (this.activePicker.mouseClickedWindow(event, this.font)) {
 				this.activePicker = this.activePicker.isWindowOpen() ? this.activePicker : null;
 				return true;
 			}
@@ -386,5 +431,56 @@ public class ClickGuiScreen extends Screen {
 	@Override
 	public boolean isInGameUi() {
 		return true;
+	}
+
+	private void openUpdateUrl() {
+		System.out.println("[Circlor4J] openUpdateUrl() called");
+		if (!UpdateChecker.hasUpdate()) {
+			System.out.println("[Circlor4J] No update, returning");
+			return;
+		}
+		String url = UpdateChecker.getUpdateUrl();
+		System.out.println("[Circlor4J] Update URL: " + url);
+		if (url == null || url.isEmpty()) {
+			return;
+		}
+		try {
+			URI uri = URI.create(url);
+			if (uri.getScheme() == null) {
+				uri = URI.create("https://" + url);
+			}
+			final String finalUrl = uri.toString();
+			System.out.println("[Circlor4J] Opening: " + finalUrl);
+			new Thread(() -> {
+				String os = System.getProperty("os.name", "").toLowerCase();
+				System.out.println("[Circlor4J] OS: " + os);
+				try {
+					if (os.contains("win")) {
+						System.out.println("[Circlor4J] Running rundll32");
+						Process p = Runtime.getRuntime().exec(new String[] {"rundll32", "url.dll,FileProtocolHandler", finalUrl});
+						System.out.println("[Circlor4J] rundll32 exit: " + p.waitFor());
+					} else if (os.contains("mac")) {
+						Runtime.getRuntime().exec(new String[] {"open", finalUrl});
+					} else if (os.contains("linux")) {
+						Runtime.getRuntime().exec(new String[] {"xdg-open", finalUrl});
+					} else if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(java.awt.Desktop.Action.BROWSE)) {
+						Desktop.getDesktop().browse(URI.create(finalUrl));
+					}
+				} catch (Exception e) {
+					System.out.println("[Circlor4J] exec failed: " + e);
+					try {
+						if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(java.awt.Desktop.Action.BROWSE)) {
+							System.out.println("[Circlor4J] Falling back to Desktop.browse");
+							Desktop.getDesktop().browse(URI.create(finalUrl));
+						} else {
+							System.out.println("[Circlor4J] Desktop.browse not supported");
+						}
+					} catch (Exception e2) {
+						System.out.println("[Circlor4J] Desktop.browse failed: " + e2);
+					}
+				}
+			}, "circlor4j-open-url").start();
+		} catch (Exception e) {
+		}
 	}
 }
