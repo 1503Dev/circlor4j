@@ -8,6 +8,7 @@ dev1503.circlor4j.Icon -> dev1503.circlor4j.a:
 dev1503.circlor4j.client.Circlor4jClient -> dev1503.circlor4j.client.Circlor4jClient:
     void <init>() -> <init>
     void init() -> init
+    java.lang.String lambda$init$0(net.fabricmc.loader.api.ModContainer) -> a
 dev1503.circlor4j.client.Circlor4jClient$1 -> dev1503.circlor4j.client.Circlor4jClient$1:
     void <init>() -> <init>
     void onValueChange(java.lang.String,double) -> onValueChange
@@ -140,6 +141,9 @@ dev1503.circlor4j.client.mixin.AntiDebuffLocalPlayerMixin -> dev1503.circlor4j.c
 dev1503.circlor4j.client.mixin.AntiDebuffMobEffectMixin -> dev1503.circlor4j.client.mixin.AntiDebuffMobEffectMixin:
     void <init>() -> <init>
     void onGetBlendFactor(net.minecraft.world.entity.LivingEntity,float,org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable) -> onGetBlendFactor
+dev1503.circlor4j.client.mixin.AutoJumpLocalPlayerMixin -> dev1503.circlor4j.client.mixin.AutoJumpLocalPlayerMixin:
+    void <init>() -> <init>
+    void onAiStep(org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> onAiStep
 dev1503.circlor4j.client.mixin.CameraMixin -> dev1503.circlor4j.client.mixin.CameraMixin:
     boolean detached -> detached
     net.minecraft.world.entity.Entity entity -> entity
@@ -188,6 +192,9 @@ dev1503.circlor4j.client.mixin.FlyTravelMixin -> dev1503.circlor4j.client.mixin.
 dev1503.circlor4j.client.mixin.HudMixin -> dev1503.circlor4j.client.mixin.HudMixin:
     void <init>() -> <init>
     void circlor4jOverlays(net.minecraft.client.gui.GuiGraphicsExtractor,net.minecraft.client.DeltaTracker,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> circlor4jOverlays
+dev1503.circlor4j.client.mixin.JetpackTravelMixin -> dev1503.circlor4j.client.mixin.JetpackTravelMixin:
+    void <init>() -> <init>
+    void onTravelReturn(org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> onTravelReturn
 dev1503.circlor4j.client.mixin.KeyMappingAccessor -> dev1503.circlor4j.client.mixin.KeyMappingAccessor:
     com.mojang.blaze3d.platform.InputConstants$Key circlor4jKey() -> circlor4jKey
 dev1503.circlor4j.client.mixin.KeyboardHandlerMixin -> dev1503.circlor4j.client.mixin.KeyboardHandlerMixin:
@@ -250,6 +257,17 @@ dev1503.circlor4j.client.mixin.NoHurtCamGameRendererMixin -> dev1503.circlor4j.c
 dev1503.circlor4j.client.mixin.NoJumpDelayLocalPlayerMixin -> dev1503.circlor4j.client.mixin.NoJumpDelayLocalPlayerMixin:
     void <init>() -> <init>
     void onAiStep(org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> onAiStep
+dev1503.circlor4j.client.mixin.NoParticlesClientLevelMixin -> dev1503.circlor4j.client.mixin.NoParticlesClientLevelMixin:
+    void <init>() -> <init>
+    void cancelParticle(net.minecraft.core.particles.ParticleOptions,double,double,double,double,double,double,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> cancelParticle
+    void cancelParticleWithFlags(net.minecraft.core.particles.ParticleOptions,boolean,boolean,double,double,double,double,double,double,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> cancelParticleWithFlags
+    void cancelAlwaysVisibleParticle(net.minecraft.core.particles.ParticleOptions,double,double,double,double,double,double,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> cancelAlwaysVisibleParticle
+    void cancelAlwaysVisibleParticleWithFlag(net.minecraft.core.particles.ParticleOptions,boolean,double,double,double,double,double,double,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> cancelAlwaysVisibleParticleWithFlag
+    void cancelDestroyBlockEffect(net.minecraft.core.BlockPos,net.minecraft.world.level.block.state.BlockState,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> cancelDestroyBlockEffect
+    void cancelBreakingBlockEffect(net.minecraft.core.BlockPos,net.minecraft.core.Direction,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> cancelBreakingBlockEffect
+dev1503.circlor4j.client.mixin.NoParticlesParticleEngineMixin -> dev1503.circlor4j.client.mixin.NoParticlesParticleEngineMixin:
+    void <init>() -> <init>
+    void cancelCreateParticle(net.minecraft.core.particles.ParticleOptions,double,double,double,double,double,double,org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable) -> cancelCreateParticle
 dev1503.circlor4j.client.mixin.RenderTypeAccessor -> dev1503.circlor4j.client.mixin.RenderTypeAccessor:
     net.minecraft.client.renderer.rendertype.RenderType circlor4jCreate(java.lang.String,net.minecraft.client.renderer.rendertype.RenderSetup) -> circlor4jCreate
 dev1503.circlor4j.client.mixin.TimerDeltaTrackerMixin -> dev1503.circlor4j.client.mixin.TimerDeltaTrackerMixin:
@@ -569,17 +587,23 @@ dev1503.circlor4j.client.module.modules.AutoClickerModule -> m:
 dev1503.circlor4j.client.module.modules.AutoClickerModule$1 -> m$1:
     int[] $SwitchMap$net$minecraft$world$phys$HitResult$Type -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.client.module.modules.AutoSprintModule -> n:
+dev1503.circlor4j.client.module.modules.AutoJumpModule -> n:
+    java.lang.String ID -> ID
+    java.lang.String MOVING -> a
+    void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
+    boolean isActive() -> isActive
+    boolean isMovingEnabled() -> isMovingEnabled
+dev1503.circlor4j.client.module.modules.AutoSprintModule -> o:
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     void onTick() -> onTick
-dev1503.circlor4j.client.module.modules.AutoTotemModule -> o:
+dev1503.circlor4j.client.module.modules.AutoTotemModule -> p:
     int OFFHAND_SLOT -> a
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     boolean isActive() -> isActive
     void onTick() -> onTick
     int findTotem(net.minecraft.world.entity.player.Player) -> a
     void moveTotemToOffhand(net.minecraft.client.Minecraft,int) -> a
-dev1503.circlor4j.client.module.modules.ClickGuiModule -> p:
+dev1503.circlor4j.client.module.modules.ClickGuiModule -> q:
     java.lang.String ID -> ID
     java.lang.String BACKGROUND -> a
     int DEFAULT_BACKGROUND -> DEFAULT_BACKGROUND
@@ -590,11 +614,11 @@ dev1503.circlor4j.client.module.modules.ClickGuiModule -> p:
     void onEnable() -> onEnable
     void onDisable() -> onDisable
     int getBackgroundColor() -> getBackgroundColor
-dev1503.circlor4j.client.module.modules.CriticalsModule -> q:
+dev1503.circlor4j.client.module.modules.CriticalsModule -> r:
     java.lang.String ID -> ID
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     boolean isActive() -> isActive
-dev1503.circlor4j.client.module.modules.CrystalAuraModule -> r:
+dev1503.circlor4j.client.module.modules.CrystalAuraModule -> s:
     java.lang.String ID -> ID
     java.lang.String PLACE_RANGE -> a
     java.lang.String BREAK_RANGE -> b
@@ -617,12 +641,12 @@ dev1503.circlor4j.client.module.modules.CrystalAuraModule -> r:
     float estimateDamage(net.minecraft.world.entity.Entity,net.minecraft.world.phys.Vec3) -> a
     boolean hasLineOfSight(net.minecraft.world.level.Level,net.minecraft.world.phys.Vec3,net.minecraft.world.phys.Vec3,net.minecraft.world.entity.Entity) -> a
     int findEndCrystalSlot(net.minecraft.client.player.LocalPlayer) -> a
-dev1503.circlor4j.client.module.modules.DerpModule -> s:
+dev1503.circlor4j.client.module.modules.DerpModule -> t:
     float currentYaw -> a
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     boolean isActive() -> isActive
     void onTick() -> onTick
-dev1503.circlor4j.client.module.modules.EagleModule -> t:
+dev1503.circlor4j.client.module.modules.EagleModule -> u:
     java.lang.String ID -> ID
     java.lang.String EDGE_DISTANCE -> a
     java.lang.String CURRENT_EDGE_DISTANCE -> b
@@ -666,7 +690,7 @@ dev1503.circlor4j.client.module.modules.EagleModule -> t:
     boolean conditionsMet(net.minecraft.world.entity.player.Player,boolean,boolean,boolean,boolean,boolean) -> conditionsMet
     void onDisable() -> onDisable
     void <clinit>() -> <clinit>
-dev1503.circlor4j.client.module.modules.EspModule -> u:
+dev1503.circlor4j.client.module.modules.EspModule -> v:
     java.lang.String ID -> ID
     java.lang.String MOBS -> a
     java.lang.String PLAYERS -> b
@@ -683,11 +707,11 @@ dev1503.circlor4j.client.module.modules.EspModule -> u:
     int getPlayersColor() -> getPlayersColor
     int getItemsColor() -> getItemsColor
     float getThickness() -> getThickness
-dev1503.circlor4j.client.module.modules.FastStopModule -> v:
+dev1503.circlor4j.client.module.modules.FastStopModule -> w:
     java.lang.String ID -> ID
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     boolean isActive() -> isActive
-dev1503.circlor4j.client.module.modules.FlyModule -> w:
+dev1503.circlor4j.client.module.modules.FlyModule -> x:
     java.lang.String ID -> ID
     java.lang.String MODE -> a
     int MODE_VANILLA -> a
@@ -697,7 +721,7 @@ dev1503.circlor4j.client.module.modules.FlyModule -> w:
     boolean isActive() -> isActive
     boolean isVanillaFlyMode() -> isVanillaFlyMode
     boolean isVanillaPositionMode() -> isVanillaPositionMode
-dev1503.circlor4j.client.module.modules.FreecamModule -> x:
+dev1503.circlor4j.client.module.modules.FreecamModule -> y:
     java.lang.String ID -> ID
     java.lang.String SPEED -> a
     java.lang.String HIDE_PLAYER -> b
@@ -722,7 +746,7 @@ dev1503.circlor4j.client.module.modules.FreecamModule -> x:
     float lerpAngle(float,float,float) -> a
     double getSpeed() -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.client.module.modules.FreelookModule -> y:
+dev1503.circlor4j.client.module.modules.FreelookModule -> z:
     java.lang.String ID -> ID
     net.minecraft.client.CameraType savedCameraType -> a
     boolean available -> a
@@ -734,7 +758,7 @@ dev1503.circlor4j.client.module.modules.FreelookModule -> y:
     boolean isActive() -> isActive
     void updateRotation(double,double) -> updateRotation
     float[] getRotation() -> getRotation
-dev1503.circlor4j.client.module.modules.FullBrightModule -> z:
+dev1503.circlor4j.client.module.modules.FullBrightModule -> A:
     java.lang.String ID -> ID
     java.lang.String MODE -> a
     java.lang.String GAMMA -> b
@@ -744,7 +768,7 @@ dev1503.circlor4j.client.module.modules.FullBrightModule -> z:
     boolean isNightVisionActive() -> isNightVisionActive
     boolean isGammaActive() -> isGammaActive
     double getGammaValue() -> getGammaValue
-dev1503.circlor4j.client.module.modules.HighJumpModule -> A:
+dev1503.circlor4j.client.module.modules.HighJumpModule -> B:
     java.lang.String ID -> ID
     java.lang.String MODE -> a
     java.lang.String HEIGHT -> b
@@ -760,7 +784,7 @@ dev1503.circlor4j.client.module.modules.HighJumpModule -> A:
     boolean isVelocityMode() -> isVelocityMode
     double getHeight() -> getHeight
     void restoreHeight() -> a
-dev1503.circlor4j.client.module.modules.HitboxModule -> B:
+dev1503.circlor4j.client.module.modules.HitboxModule -> C:
     java.lang.String ID -> ID
     java.lang.String MOBS -> a
     java.lang.String PLAYERS -> b
@@ -773,11 +797,11 @@ dev1503.circlor4j.client.module.modules.HitboxModule -> B:
     double getMobsVertical() -> getMobsVertical
     double getPlayersHorizon() -> getPlayersHorizon
     double getPlayersVertical() -> getPlayersVertical
-dev1503.circlor4j.client.module.modules.InventoryMoveModule -> C:
+dev1503.circlor4j.client.module.modules.InventoryMoveModule -> D:
     java.lang.String ID -> ID
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     boolean isActive() -> isActive
-dev1503.circlor4j.client.module.modules.ItemTagModule -> D:
+dev1503.circlor4j.client.module.modules.ItemTagModule -> E:
     java.lang.String ID -> ID
     java.lang.String TEXT_SIZE -> a
     java.lang.String SCALE_BY_DISTANCE -> b
@@ -785,10 +809,12 @@ dev1503.circlor4j.client.module.modules.ItemTagModule -> D:
     boolean isActive() -> isActive
     float getTextSize() -> getTextSize
     boolean isScaleByDistance() -> isScaleByDistance
-dev1503.circlor4j.client.module.modules.JetpackModule -> E:
+dev1503.circlor4j.client.module.modules.JetpackModule -> F:
+    java.lang.String ID -> ID
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
+    boolean isActive() -> isActive
     void onTick() -> onTick
-dev1503.circlor4j.client.module.modules.KillAuraModule -> F:
+dev1503.circlor4j.client.module.modules.KillAuraModule -> G:
     java.lang.String ID -> ID
     java.lang.String MAX_REACH -> a
     java.lang.String MODE -> b
@@ -808,7 +834,7 @@ dev1503.circlor4j.client.module.modules.KillAuraModule -> F:
     void onTick() -> onTick
     void attack(net.minecraft.client.Minecraft,net.minecraft.client.player.LocalPlayer) -> a
     java.util.List collectTargets(net.minecraft.client.player.LocalPlayer) -> a
-dev1503.circlor4j.client.module.modules.LanguageModule -> G:
+dev1503.circlor4j.client.module.modules.LanguageModule -> H:
     java.lang.String OPTION_PATH -> OPTION_PATH
     java.lang.String[] LANG_IDS -> LANG_IDS
     java.lang.String[] LANG_FALLBACKS -> LANG_FALLBACKS
@@ -819,45 +845,49 @@ dev1503.circlor4j.client.module.modules.LanguageModule -> G:
     int indexOfCurrentLanguage() -> indexOfCurrentLanguage
     int clampIndex(int) -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.client.module.modules.LowFireModule -> H:
+dev1503.circlor4j.client.module.modules.LowFireModule -> I:
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     boolean isActive() -> isActive
-dev1503.circlor4j.client.module.modules.NameTagModule -> I:
+dev1503.circlor4j.client.module.modules.NameTagModule -> J:
     java.lang.String ID -> ID
     java.lang.String SHOW_HEALTH -> a
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     boolean isActive() -> isActive
     boolean isShowHealth() -> isShowHealth
-dev1503.circlor4j.client.module.modules.NoCameraClipModule -> J:
+dev1503.circlor4j.client.module.modules.NoCameraClipModule -> K:
     java.lang.String ID -> ID
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     boolean isActive() -> isActive
-dev1503.circlor4j.client.module.modules.NoFallModule -> K:
+dev1503.circlor4j.client.module.modules.NoFallModule -> L:
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     void onTick() -> onTick
     boolean isActive() -> isActive
     boolean isHoldingMace(net.minecraft.client.player.LocalPlayer) -> a
-dev1503.circlor4j.client.module.modules.NoHurtCamModule -> L:
+dev1503.circlor4j.client.module.modules.NoHurtCamModule -> M:
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     boolean isActive() -> isActive
-dev1503.circlor4j.client.module.modules.NoJumpDelayModule -> M:
+dev1503.circlor4j.client.module.modules.NoJumpDelayModule -> N:
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     boolean isActive() -> isActive
-dev1503.circlor4j.client.module.modules.NoSlowDownModule -> N:
+dev1503.circlor4j.client.module.modules.NoParticlesModule -> O:
     java.lang.String ID -> ID
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     boolean isActive() -> isActive
-dev1503.circlor4j.client.module.modules.NoWebModule -> O:
+dev1503.circlor4j.client.module.modules.NoSlowDownModule -> P:
     java.lang.String ID -> ID
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     boolean isActive() -> isActive
-dev1503.circlor4j.client.module.modules.NukerModule -> P:
+dev1503.circlor4j.client.module.modules.NoWebModule -> Q:
+    java.lang.String ID -> ID
+    void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
+    boolean isActive() -> isActive
+dev1503.circlor4j.client.module.modules.NukerModule -> R:
     java.lang.String ID -> ID
     java.lang.String RADIUS -> a
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     boolean isActive() -> isActive
     int getRadius() -> getRadius
-dev1503.circlor4j.client.module.modules.ReachModule -> Q:
+dev1503.circlor4j.client.module.modules.ReachModule -> S:
     java.lang.String REACH -> a
     double originalBlockReach -> a
     double originalEntityReach -> b
@@ -866,22 +896,59 @@ dev1503.circlor4j.client.module.modules.ReachModule -> Q:
     void onDisable() -> onDisable
     void onTick() -> onTick
     void restore() -> a
-dev1503.circlor4j.client.module.modules.ScaffoldModule -> R:
+dev1503.circlor4j.client.module.modules.ScaffoldModule -> T:
     java.lang.String ID -> ID
-    java.lang.String SWING -> a
-    java.lang.String ROTATE -> b
+    java.lang.String FAST_TOWER -> a
+    java.lang.String TOWER_SPEED -> b
+    java.lang.String WHILE_MOVING -> c
+    java.lang.String ONLY_ON_CLICK -> d
+    java.lang.String AUTO_SWITCH -> e
+    java.lang.String ROTATE -> f
+    java.lang.String AIR_PLACE -> g
+    java.lang.String AHEAD_DISTANCE -> h
+    java.lang.String PLACE_RANGE -> i
+    java.lang.String RADIUS -> j
+    java.lang.String BLOCKS_PER_TICK -> k
+    java.lang.String SWING -> l
+    java.lang.String BLOCKS -> m
+    java.lang.String BLOCKS_FILTER -> n
+    java.lang.String[] DEFAULT_BLOCKS -> a
     int placeDelayCounter -> a
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
+    java.lang.String blocksPrefix() -> a
+    java.util.List getSelectedBlocks() -> a
+    boolean isBlocksFilterWhitelist() -> c
     boolean isActive() -> isActive
+    boolean isFastTowerEnabled() -> isFastTowerEnabled
+    double getTowerSpeed() -> getTowerSpeed
+    boolean isWhileMovingEnabled() -> isWhileMovingEnabled
+    boolean isOnlyOnClickEnabled() -> isOnlyOnClickEnabled
+    boolean isAutoSwitchEnabled() -> isAutoSwitchEnabled
     boolean isRotateEnabled() -> isRotateEnabled
+    boolean isAirPlaceEnabled() -> isAirPlaceEnabled
+    double getAheadDistance() -> getAheadDistance
+    double getPlaceRange() -> getPlaceRange
+    int getRadius() -> getRadius
+    int getBlocksPerTick() -> getBlocksPerTick
     boolean isSwingEnabled() -> isSwingEnabled
     void onTick() -> onTick
-    net.minecraft.core.Direction getPlaceDirection(net.minecraft.client.Minecraft,net.minecraft.core.BlockPos) -> a
-    void placeBlock(net.minecraft.client.Minecraft,net.minecraft.core.BlockPos,net.minecraft.core.Direction,int) -> a
+    boolean scaffolding() -> a
+    boolean towering() -> b
+    boolean hasBlocks(net.minecraft.client.Minecraft) -> a
+    net.minecraft.world.InteractionHand getHand() -> a
+    boolean validItem(net.minecraft.world.item.ItemStack,net.minecraft.core.BlockPos) -> a
+    boolean place(net.minecraft.client.Minecraft,net.minecraft.core.BlockPos) -> a
+    int findBlockSlot(net.minecraft.client.Minecraft,net.minecraft.core.BlockPos) -> a
+    net.minecraft.core.Direction getPlaceSide(net.minecraft.core.BlockPos) -> a
+    net.minecraft.core.Direction getClosestPlaceSide(net.minecraft.core.BlockPos) -> b
+    boolean canPlace(net.minecraft.core.BlockPos) -> a
+    double squaredDistanceTo(net.minecraft.core.BlockPos) -> a
+    boolean isMoving(net.minecraft.client.player.LocalPlayer) -> a
+    net.minecraft.world.phys.Vec3 getDirectionFromYaw(float) -> a
     float[] getRotations(net.minecraft.world.phys.Vec3) -> a
-    int findBlockSlot(net.minecraft.client.Minecraft) -> a
-    boolean isAir(net.minecraft.client.Minecraft,net.minecraft.core.BlockPos) -> a
-dev1503.circlor4j.client.module.modules.SpeedModule -> S:
+    double lambda$onTick$0(net.minecraft.core.BlockPos,net.minecraft.core.BlockPos) -> a
+    void <clinit>() -> <clinit>
+dev1503.circlor4j.client.module.modules.SpeedModule -> U:
     java.lang.String MODE -> a
     java.lang.String SPEED -> b
     int MODE_VELOCITY -> a
@@ -893,11 +960,11 @@ dev1503.circlor4j.client.module.modules.SpeedModule -> S:
     void onTick() -> onTick
     void applyVelocity(net.minecraft.client.player.LocalPlayer,double) -> a
     void restoreSpeed() -> a
-dev1503.circlor4j.client.module.modules.TimerModule -> T:
+dev1503.circlor4j.client.module.modules.TimerModule -> V:
     java.lang.String TPS -> a
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     float getSpeed() -> getSpeed
-dev1503.circlor4j.client.module.modules.TracerModule -> U:
+dev1503.circlor4j.client.module.modules.TracerModule -> W:
     java.lang.String ID -> ID
     java.lang.String MOBS -> a
     java.lang.String PLAYERS -> b
@@ -919,7 +986,7 @@ dev1503.circlor4j.client.module.modules.TracerModule -> U:
     int getItemsColor() -> getItemsColor
     float getThickness() -> getThickness
     int getAnchor() -> getAnchor
-dev1503.circlor4j.client.module.modules.TrueSightModule -> V:
+dev1503.circlor4j.client.module.modules.TrueSightModule -> X:
     java.lang.String ID -> ID
     java.lang.String ENTITIES -> a
     java.lang.String BLOCKS -> b
@@ -927,7 +994,7 @@ dev1503.circlor4j.client.module.modules.TrueSightModule -> V:
     boolean isActive() -> isActive
     boolean isEntitiesEnabled() -> isEntitiesEnabled
     boolean isBlocksEnabled() -> isBlocksEnabled
-dev1503.circlor4j.client.module.modules.XrayModule -> W:
+dev1503.circlor4j.client.module.modules.XrayModule -> Y:
     java.lang.String ID -> ID
     java.lang.String BLOCKS -> BLOCKS
     java.lang.String COLORS -> COLORS
@@ -954,17 +1021,24 @@ dev1503.circlor4j.client.module.modules.XrayModule -> W:
     int getBlockColor(net.minecraft.world.level.block.Block) -> getBlockColor
     int defaultColorFor(java.lang.String) -> defaultColorFor
     void <clinit>() -> <clinit>
-dev1503.circlor4j.client.module.modules.ZoomModule -> X:
+dev1503.circlor4j.client.module.modules.ZoomModule -> Z:
     java.lang.String FOV -> a
+    java.lang.String BALANCE_SENSITIVITY -> b
+    double DEFAULT_FOV -> a
+    double originalSensitivity -> b
     void <init>(dev1503.circlor4j.ui.StatusManager) -> <init>
     boolean isActive() -> isActive
     int getFov() -> getFov
-dev1503.circlor4j.client.render.EspRenderType -> Y:
+    boolean isBalanceSensitivityEnabled() -> isBalanceSensitivityEnabled
+    void onEnable() -> onEnable
+    void onTick() -> onTick
+    void onDisable() -> onDisable
+dev1503.circlor4j.client.render.EspRenderType -> aa:
     net.minecraft.client.renderer.rendertype.RenderType LINES -> LINES
     void <init>() -> <init>
     net.minecraft.client.renderer.rendertype.RenderType create() -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.client.render.ItemTagRenderer -> Z:
+dev1503.circlor4j.client.render.ItemTagRenderer -> ab:
     net.minecraft.world.phys.Vec3 cameraPos -> a
     org.joml.Matrix4f viewRotation -> a
     org.joml.Matrix4f projection -> b
@@ -972,7 +1046,7 @@ dev1503.circlor4j.client.render.ItemTagRenderer -> Z:
     void capture(net.minecraft.client.renderer.state.level.CameraRenderState) -> capture
     void render(net.minecraft.client.gui.GuiGraphicsExtractor) -> render
     net.minecraft.world.phys.Vec3 worldToScreen(net.minecraft.world.phys.Vec3,int,int) -> a
-dev1503.circlor4j.client.render.NameTagRenderer -> aa:
+dev1503.circlor4j.client.render.NameTagRenderer -> ac:
     net.minecraft.world.phys.Vec3 cameraPos -> a
     org.joml.Matrix4f viewRotation -> a
     org.joml.Matrix4f projection -> b
@@ -980,7 +1054,7 @@ dev1503.circlor4j.client.render.NameTagRenderer -> aa:
     void capture(net.minecraft.client.renderer.state.level.CameraRenderState) -> capture
     void render(net.minecraft.client.gui.GuiGraphicsExtractor) -> render
     net.minecraft.world.phys.Vec3 worldToScreen(net.minecraft.world.phys.Vec3,int,int) -> a
-dev1503.circlor4j.client.render.TracerRenderer -> ab:
+dev1503.circlor4j.client.render.TracerRenderer -> ad:
     net.minecraft.world.phys.Vec3 cameraPos -> a
     org.joml.Matrix4f viewRotation -> a
     org.joml.Matrix4f projection -> b
@@ -989,12 +1063,12 @@ dev1503.circlor4j.client.render.TracerRenderer -> ab:
     void render(net.minecraft.client.gui.GuiGraphicsExtractor) -> render
     net.minecraft.world.phys.Vec3 worldToScreen(net.minecraft.world.phys.Vec3,int,int) -> a
     void drawLine(net.minecraft.client.gui.GuiGraphicsExtractor,float,float,float,float,float,int) -> a
-dev1503.circlor4j.client.render.XrayRenderType -> ac:
+dev1503.circlor4j.client.render.XrayRenderType -> ae:
     net.minecraft.client.renderer.rendertype.RenderType XRAY -> XRAY
     void <init>() -> <init>
     net.minecraft.client.renderer.rendertype.RenderType create() -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.client.render.XrayRenderer -> ad:
+dev1503.circlor4j.client.render.XrayRenderer -> af:
     int[][] NEIGHBORS -> a
     java.util.List cachedOutlines -> a
     int cachedVersion -> a
@@ -1008,7 +1082,7 @@ dev1503.circlor4j.client.render.XrayRenderer -> ad:
     void rebuild(net.minecraft.client.Minecraft,net.minecraft.core.BlockPos,int,int,int) -> a
     void render(com.mojang.blaze3d.vertex.PoseStack,net.minecraft.client.renderer.SubmitNodeCollector,net.minecraft.world.phys.Vec3) -> render
     void <clinit>() -> <clinit>
-dev1503.circlor4j.client.render.XrayRenderer$Outline -> ad$a:
+dev1503.circlor4j.client.render.XrayRenderer$Outline -> af$a:
     net.minecraft.world.phys.shapes.VoxelShape shape -> a
     int color -> a
     void <init>(net.minecraft.world.phys.shapes.VoxelShape,int) -> <init>
@@ -1017,7 +1091,36 @@ dev1503.circlor4j.client.render.XrayRenderer$Outline -> ad$a:
     boolean equals(java.lang.Object) -> equals
     net.minecraft.world.phys.shapes.VoxelShape shape() -> shape
     int color() -> color
-dev1503.circlor4j.i18n.I18n -> ae:
+dev1503.circlor4j.client.update.UpdateChecker -> ag:
+    java.lang.String API_URL -> a
+    java.util.regex.Pattern VERSION_PATTERN -> a
+    java.util.concurrent.ScheduledExecutorService EXECUTOR -> a
+    dev1503.circlor4j.client.update.UpdateChecker$UpdateInfo latestInfo -> a
+    boolean checked -> a
+    void <init>() -> <init>
+    void checkForUpdates(java.lang.String) -> a
+    void fetchUpdateInfo(java.lang.String) -> b
+    java.lang.String extractJsonField(java.lang.String,java.lang.String) -> a
+    java.lang.String unescapeJsonString(java.lang.String) -> a
+    int[] parseVersion(java.lang.String) -> a
+    boolean isNewer(java.lang.String,java.lang.String) -> a
+    dev1503.circlor4j.client.update.UpdateChecker$UpdateInfo getUpdateInfo() -> a
+    boolean hasUpdate() -> a
+    java.lang.String getUpdateUrl() -> a
+    java.lang.Void lambda$checkForUpdates$1(java.lang.Throwable) -> a
+    void lambda$checkForUpdates$0(java.lang.String) -> c
+    java.lang.Thread lambda$static$0(java.lang.Runnable) -> a
+    void <clinit>() -> <clinit>
+dev1503.circlor4j.client.update.UpdateChecker$UpdateInfo -> ag$a:
+    java.lang.String latest -> a
+    java.lang.String url -> b
+    void <init>(java.lang.String,java.lang.String) -> <init>
+    java.lang.String toString() -> toString
+    int hashCode() -> hashCode
+    boolean equals(java.lang.Object) -> equals
+    java.lang.String latest() -> a
+    java.lang.String url() -> b
+dev1503.circlor4j.i18n.I18n -> ah:
     java.lang.String DEFAULT_LANG -> DEFAULT_LANG
     java.lang.String lang -> lang
     void <init>() -> <init>
@@ -1025,7 +1128,7 @@ dev1503.circlor4j.i18n.I18n -> ae:
     java.lang.String tIn(java.lang.String,java.lang.String,java.lang.Object[]) -> tIn
     java.lang.String lookup(java.lang.String,java.lang.String,java.lang.Object[]) -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.i18n.Lang -> af:
+dev1503.circlor4j.i18n.Lang -> ai:
     java.util.Map en -> en
     java.util.Map zh_hans -> zh_hans
     java.util.Map languages -> languages
@@ -1034,7 +1137,7 @@ dev1503.circlor4j.i18n.Lang -> af:
 dev1503.circlor4j.mixin.ExampleMixin -> dev1503.circlor4j.mixin.ExampleMixin:
     void <init>() -> <init>
     void init(org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> init
-dev1503.circlor4j.ui.StatusManager -> ag:
+dev1503.circlor4j.ui.StatusManager -> aj:
     dev1503.circlor4j.ui.StatusManager INSTANCE -> a
     java.util.Map store -> a
     java.util.List widgets -> a
@@ -1062,10 +1165,10 @@ dev1503.circlor4j.ui.StatusManager -> ag:
     float getFloat(java.lang.String,float) -> getFloat
     float getFloat(java.lang.String) -> getFloat
     void <clinit>() -> <clinit>
-dev1503.circlor4j.ui.StatusManager$Listener -> ag$a:
+dev1503.circlor4j.ui.StatusManager$Listener -> aj$a:
     void onValueChange(java.lang.String,double) -> onValueChange
     void onActionTrigger(java.lang.String) -> onActionTrigger
-dev1503.circlor4j.ui.clickgui.ClickGuiScreen -> ah:
+dev1503.circlor4j.ui.clickgui.ClickGuiScreen -> ak:
     java.util.List windows -> a
     dev1503.circlor4j.ui.component.Dropdown activeMenu -> a
     dev1503.circlor4j.ui.component.ColorPicker activePicker -> a
@@ -1074,6 +1177,7 @@ dev1503.circlor4j.ui.clickgui.ClickGuiScreen -> ah:
     java.lang.String renderedLang -> a
     int lastMouseX -> a
     int lastMouseY -> b
+    net.minecraft.client.gui.components.Button updateButton -> a
     void <init>() -> <init>
     void init() -> init
     void rebuildWindows() -> a
@@ -1095,8 +1199,11 @@ dev1503.circlor4j.ui.clickgui.ClickGuiScreen -> ah:
     boolean charTyped(net.minecraft.client.input.CharacterEvent) -> charTyped
     boolean isPauseScreen() -> isPauseScreen
     boolean isInGameUi() -> isInGameUi
+    void openUpdateUrl() -> c
+    void lambda$openUpdateUrl$0(java.lang.String) -> a
     java.lang.String lambda$extractRenderState$0(net.fabricmc.loader.api.ModContainer) -> a
-dev1503.circlor4j.ui.component.ActionButton -> ai:
+    void lambda$init$0(net.minecraft.client.gui.components.Button) -> a
+dev1503.circlor4j.ui.component.ActionButton -> al:
     int HOVER_COLOR -> a
     int TEXT_COLOR -> b
     dev1503.circlor4j.ui.StatusManager status -> a
@@ -1112,7 +1219,7 @@ dev1503.circlor4j.ui.component.ActionButton -> ai:
     boolean contains(int,int) -> contains
     boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent) -> mouseClicked
     void render(net.minecraft.client.gui.GuiGraphicsExtractor,net.minecraft.client.gui.Font,int,int) -> render
-dev1503.circlor4j.ui.component.BlockList -> aj:
+dev1503.circlor4j.ui.component.BlockList -> am:
     int WIN_W -> a
     int HEADER_H -> b
     int ITEM_H -> c
@@ -1190,7 +1297,7 @@ dev1503.circlor4j.ui.component.BlockList -> aj:
     void renderBlockIcon(net.minecraft.client.gui.GuiGraphicsExtractor,java.lang.String,int,int) -> a
     void lambda$openContextMenu$1(java.lang.String) -> b
     void lambda$openContextMenu$0(java.lang.String) -> c
-dev1503.circlor4j.ui.component.CategoryWindow -> ak:
+dev1503.circlor4j.ui.component.CategoryWindow -> an:
     int WIDTH -> WIDTH
     int HEADER_HEIGHT -> HEADER_HEIGHT
     int ROW_HEIGHT -> ROW_HEIGHT
@@ -1292,7 +1399,7 @@ dev1503.circlor4j.ui.component.CategoryWindow -> ak:
     boolean mouseReleased() -> mouseReleased
     boolean mouseScrolled(int,int,double) -> mouseScrolled
     void <clinit>() -> <clinit>
-dev1503.circlor4j.ui.component.CategoryWindow$ResizeMode -> ak$a:
+dev1503.circlor4j.ui.component.CategoryWindow$ResizeMode -> an$a:
     dev1503.circlor4j.ui.component.CategoryWindow$ResizeMode NONE -> NONE
     dev1503.circlor4j.ui.component.CategoryWindow$ResizeMode RIGHT -> RIGHT
     dev1503.circlor4j.ui.component.CategoryWindow$ResizeMode BOTTOM -> BOTTOM
@@ -1303,7 +1410,7 @@ dev1503.circlor4j.ui.component.CategoryWindow$ResizeMode -> ak$a:
     void <init>(java.lang.String,int) -> <init>
     dev1503.circlor4j.ui.component.CategoryWindow$ResizeMode[] $values() -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.ui.component.ColorList -> al:
+dev1503.circlor4j.ui.component.ColorList -> ao:
     int WIN_W -> a
     int ITEM_H -> b
     int ICON -> c
@@ -1367,7 +1474,7 @@ dev1503.circlor4j.ui.component.ColorList -> al:
     void renderList(net.minecraft.client.gui.GuiGraphicsExtractor,net.minecraft.client.gui.Font,int,int,int,int) -> a
     void renderBlockIcon(net.minecraft.client.gui.GuiGraphicsExtractor,java.lang.String,int,int) -> a
     void lambda$openContextMenu$0(java.lang.String) -> a
-dev1503.circlor4j.ui.component.ColorPicker -> am:
+dev1503.circlor4j.ui.component.ColorPicker -> ap:
     int PAD -> a
     int SQUARE -> b
     int HUE_W -> c
@@ -1434,7 +1541,7 @@ dev1503.circlor4j.ui.component.ColorPicker -> am:
     int hsvToArgb(float,float,float,int) -> a
     void renderRow(net.minecraft.client.gui.GuiGraphicsExtractor,net.minecraft.client.gui.Font,int,int) -> renderRow
     void renderWindow(net.minecraft.client.gui.GuiGraphicsExtractor,net.minecraft.client.gui.Font,int,int) -> renderWindow
-dev1503.circlor4j.ui.component.ColorPicker$DragRegion -> am$a:
+dev1503.circlor4j.ui.component.ColorPicker$DragRegion -> ap$a:
     dev1503.circlor4j.ui.component.ColorPicker$DragRegion NONE -> NONE
     dev1503.circlor4j.ui.component.ColorPicker$DragRegion SQUARE -> SQUARE
     dev1503.circlor4j.ui.component.ColorPicker$DragRegion HUE -> HUE
@@ -1445,7 +1552,7 @@ dev1503.circlor4j.ui.component.ColorPicker$DragRegion -> am$a:
     void <init>(java.lang.String,int) -> <init>
     dev1503.circlor4j.ui.component.ColorPicker$DragRegion[] $values() -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.ui.component.Component -> an:
+dev1503.circlor4j.ui.component.Component -> aq:
     java.lang.String path -> a
     java.lang.String showCondition -> b
     java.lang.String hideCondition -> c
@@ -1454,10 +1561,10 @@ dev1503.circlor4j.ui.component.Component -> an:
     void setShowCondition(java.lang.String) -> setShowCondition
     void setHideCondition(java.lang.String) -> setHideCondition
     boolean isVisible(dev1503.circlor4j.ui.StatusManager) -> isVisible
-dev1503.circlor4j.ui.component.Condition -> ao:
+dev1503.circlor4j.ui.component.Condition -> ar:
     void <init>() -> <init>
     boolean evaluate(dev1503.circlor4j.ui.StatusManager,java.lang.String) -> evaluate
-dev1503.circlor4j.ui.component.Condition$Lexer -> ao$a:
+dev1503.circlor4j.ui.component.Condition$Lexer -> ar$a:
     java.lang.String src -> a
     int pos -> a
     dev1503.circlor4j.ui.component.Condition$Token current -> a
@@ -1467,7 +1574,7 @@ dev1503.circlor4j.ui.component.Condition$Lexer -> ao$a:
     void skipWs() -> b
     char peek2() -> a
     dev1503.circlor4j.ui.component.Condition$Token nextToken() -> b
-dev1503.circlor4j.ui.component.Condition$Op -> ao$b:
+dev1503.circlor4j.ui.component.Condition$Op -> ar$b:
     dev1503.circlor4j.ui.component.Condition$Op NONE -> NONE
     dev1503.circlor4j.ui.component.Condition$Op EQ -> EQ
     dev1503.circlor4j.ui.component.Condition$Op NE -> NE
@@ -1483,7 +1590,7 @@ dev1503.circlor4j.ui.component.Condition$Op -> ao$b:
     void <init>(java.lang.String,int) -> <init>
     dev1503.circlor4j.ui.component.Condition$Op[] $values() -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.ui.component.Condition$Parser -> ao$c:
+dev1503.circlor4j.ui.component.Condition$Parser -> ar$c:
     dev1503.circlor4j.ui.StatusManager status -> a
     dev1503.circlor4j.ui.component.Condition$Lexer lexer -> a
     void <init>(dev1503.circlor4j.ui.StatusManager,dev1503.circlor4j.ui.component.Condition$Lexer) -> <init>
@@ -1494,12 +1601,12 @@ dev1503.circlor4j.ui.component.Condition$Parser -> ao$c:
     double parseOperand() -> a
     boolean isComparison(dev1503.circlor4j.ui.component.Condition$Op) -> a
     boolean compare(double,dev1503.circlor4j.ui.component.Condition$Op,double) -> a
-dev1503.circlor4j.ui.component.Condition$Token -> ao$d:
+dev1503.circlor4j.ui.component.Condition$Token -> ar$d:
     dev1503.circlor4j.ui.component.Condition$TokenType type -> a
     dev1503.circlor4j.ui.component.Condition$Op op -> a
     java.lang.String text -> a
     void <init>(dev1503.circlor4j.ui.component.Condition$TokenType,dev1503.circlor4j.ui.component.Condition$Op,java.lang.String) -> <init>
-dev1503.circlor4j.ui.component.Condition$TokenType -> ao$e:
+dev1503.circlor4j.ui.component.Condition$TokenType -> ar$e:
     dev1503.circlor4j.ui.component.Condition$TokenType LPAREN -> LPAREN
     dev1503.circlor4j.ui.component.Condition$TokenType RPAREN -> RPAREN
     dev1503.circlor4j.ui.component.Condition$TokenType OP -> OP
@@ -1511,7 +1618,7 @@ dev1503.circlor4j.ui.component.Condition$TokenType -> ao$e:
     void <init>(java.lang.String,int) -> <init>
     dev1503.circlor4j.ui.component.Condition$TokenType[] $values() -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.ui.component.ContextMenu -> ap:
+dev1503.circlor4j.ui.component.ContextMenu -> as:
     int ITEM_H -> a
     int PAD -> b
     int TEXT_COLOR -> c
@@ -1533,7 +1640,7 @@ dev1503.circlor4j.ui.component.ContextMenu -> ap:
     int itemAt(int) -> a
     boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent) -> mouseClicked
     void render(net.minecraft.client.gui.GuiGraphicsExtractor,net.minecraft.client.gui.Font,int,int) -> render
-dev1503.circlor4j.ui.component.Dropdown -> aq:
+dev1503.circlor4j.ui.component.Dropdown -> at:
     int MENU_PADDING -> a
     int HOVER_COLOR -> b
     int MENU_BG_COLOR -> c
@@ -1570,7 +1677,7 @@ dev1503.circlor4j.ui.component.Dropdown -> aq:
     boolean isRow(int,int) -> isRow
     void renderRow(net.minecraft.client.gui.GuiGraphicsExtractor,net.minecraft.client.gui.Font,int,int) -> renderRow
     void renderMenu(net.minecraft.client.gui.GuiGraphicsExtractor,net.minecraft.client.gui.Font,int,int) -> renderMenu
-dev1503.circlor4j.ui.component.RangeSlider -> ar:
+dev1503.circlor4j.ui.component.RangeSlider -> au:
     int TRACK_HEIGHT -> a
     int THUMB_WIDTH -> b
     int RIGHT_INSET -> c
@@ -1614,7 +1721,7 @@ dev1503.circlor4j.ui.component.RangeSlider -> ar:
     void render(net.minecraft.client.gui.GuiGraphicsExtractor,net.minecraft.client.gui.Font,int,int) -> render
     java.lang.String format(double) -> a
     int decimalsFromStep(double) -> b
-dev1503.circlor4j.ui.component.RangeSlider$DragThumb -> ar$a:
+dev1503.circlor4j.ui.component.RangeSlider$DragThumb -> au$a:
     dev1503.circlor4j.ui.component.RangeSlider$DragThumb NONE -> NONE
     dev1503.circlor4j.ui.component.RangeSlider$DragThumb MIN -> MIN
     dev1503.circlor4j.ui.component.RangeSlider$DragThumb MAX -> MAX
@@ -1624,7 +1731,7 @@ dev1503.circlor4j.ui.component.RangeSlider$DragThumb -> ar$a:
     void <init>(java.lang.String,int) -> <init>
     dev1503.circlor4j.ui.component.RangeSlider$DragThumb[] $values() -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.ui.component.Slider -> as:
+dev1503.circlor4j.ui.component.Slider -> av:
     int TRACK_HEIGHT -> a
     int THUMB_WIDTH -> b
     int RIGHT_INSET -> c
@@ -1666,10 +1773,10 @@ dev1503.circlor4j.ui.component.Slider -> as:
     java.lang.String formatValue() -> a
     int decimalsFromStep(double) -> a
     void render(net.minecraft.client.gui.GuiGraphicsExtractor,net.minecraft.client.gui.Font,int,int) -> render
-dev1503.circlor4j.ui.component.StatusWidget -> at:
+dev1503.circlor4j.ui.component.StatusWidget -> aw:
     java.lang.String getPath() -> getPath
     void syncStatus(double) -> syncStatus
-dev1503.circlor4j.ui.component.Toggle -> au:
+dev1503.circlor4j.ui.component.Toggle -> ax:
     int HIGHLIGHT_COLOR -> HIGHLIGHT_COLOR
     int HOVER_COLOR -> a
     int ENABLED_BG_COLOR -> b
@@ -1702,7 +1809,7 @@ dev1503.circlor4j.ui.component.Toggle -> au:
     boolean contains(int,int) -> contains
     boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent) -> mouseClicked
     void render(net.minecraft.client.gui.GuiGraphicsExtractor,net.minecraft.client.gui.Font,int,int) -> render
-dev1503.circlor4j.ui.component.UiText -> av:
+dev1503.circlor4j.ui.component.UiText -> ay:
     float CONTENT_SCALE -> CONTENT_SCALE
     java.lang.String ELLIPSIS -> a
     void <init>() -> <init>
@@ -1710,7 +1817,7 @@ dev1503.circlor4j.ui.component.UiText -> av:
     int scaledWidth(net.minecraft.client.gui.Font,java.lang.String) -> scaledWidth
     int centerY(int,int) -> centerY
     java.lang.String fit(net.minecraft.client.gui.Font,java.lang.String,int) -> fit
-dev1503.circlor4j.ui.horionarraylist.ArrayListColor -> aw:
+dev1503.circlor4j.ui.horionarraylist.ArrayListColor -> az:
     dev1503.circlor4j.ui.horionarraylist.ArrayListColor RAINBOW -> RAINBOW
     dev1503.circlor4j.ui.horionarraylist.ArrayListColor CATEGORIZED -> CATEGORIZED
     dev1503.circlor4j.ui.horionarraylist.ArrayListColor CUSTOM -> CUSTOM
@@ -1720,14 +1827,14 @@ dev1503.circlor4j.ui.horionarraylist.ArrayListColor -> aw:
     void <init>(java.lang.String,int) -> <init>
     dev1503.circlor4j.ui.horionarraylist.ArrayListColor[] $values() -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.ui.horionarraylist.ArrayListItem -> ax:
+dev1503.circlor4j.ui.horionarraylist.ArrayListItem -> aA:
     java.lang.String text -> text
     java.lang.String keybind -> keybind
     java.lang.String modeText -> modeText
     int category -> category
     void <init>(java.lang.String,java.lang.String,java.lang.String,int) -> <init>
     java.lang.String getFullText() -> getFullText
-dev1503.circlor4j.ui.horionarraylist.ArrayListMode -> ay:
+dev1503.circlor4j.ui.horionarraylist.ArrayListMode -> aB:
     dev1503.circlor4j.ui.horionarraylist.ArrayListMode NONE -> NONE
     dev1503.circlor4j.ui.horionarraylist.ArrayListMode OUTLINE -> OUTLINE
     dev1503.circlor4j.ui.horionarraylist.ArrayListMode EDGE_LINE -> EDGE_LINE
@@ -1738,7 +1845,7 @@ dev1503.circlor4j.ui.horionarraylist.ArrayListMode -> ay:
     void <init>(java.lang.String,int) -> <init>
     dev1503.circlor4j.ui.horionarraylist.ArrayListMode[] $values() -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.ui.horionarraylist.ArrayListRainbow -> az:
+dev1503.circlor4j.ui.horionarraylist.ArrayListRainbow -> aC:
     dev1503.circlor4j.ui.horionarraylist.ArrayListRainbow PASTEL -> PASTEL
     dev1503.circlor4j.ui.horionarraylist.ArrayListRainbow SATURATED -> SATURATED
     dev1503.circlor4j.ui.horionarraylist.ArrayListRainbow[] $VALUES -> a
@@ -1747,12 +1854,12 @@ dev1503.circlor4j.ui.horionarraylist.ArrayListRainbow -> az:
     void <init>(java.lang.String,int) -> <init>
     dev1503.circlor4j.ui.horionarraylist.ArrayListRainbow[] $values() -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.ui.horionarraylist.CanvasRender -> aA:
+dev1503.circlor4j.ui.horionarraylist.CanvasRender -> aD:
     void <init>() -> <init>
     void fillRect(net.minecraft.client.gui.GuiGraphicsExtractor,float,float,float,float,int) -> fillRect
     void drawLine(net.minecraft.client.gui.GuiGraphicsExtractor,float,float,float,float,int) -> drawLine
     void drawText(net.minecraft.client.gui.GuiGraphicsExtractor,net.minecraft.client.gui.Font,java.lang.String,float,float,int,float) -> drawText
-dev1503.circlor4j.ui.horionarraylist.HorionArrayList -> aB:
+dev1503.circlor4j.ui.horionarraylist.HorionArrayList -> aE:
     int GRAVITY_TOP_LEFT -> GRAVITY_TOP_LEFT
     int GRAVITY_TOP_RIGHT -> GRAVITY_TOP_RIGHT
     int GRAVITY_BOTTOM_LEFT -> GRAVITY_BOTTOM_LEFT
@@ -1805,13 +1912,13 @@ dev1503.circlor4j.ui.horionarraylist.HorionArrayList -> aB:
     boolean isLeftGravity(int) -> b
     int lambda$computeLayout$0(boolean,java.util.Map$Entry,java.util.Map$Entry) -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.ui.horionarraylist.HorionArrayList$RowLayout -> aB$a:
+dev1503.circlor4j.ui.horionarraylist.HorionArrayList$RowLayout -> aE$a:
     int id -> a
     float x -> a
     float y -> b
     float width -> c
     void <init>(int,float,float,float) -> <init>
-dev1503.circlor4j.ui.screen.AddKeyBindDialog -> aC:
+dev1503.circlor4j.ui.screen.AddKeyBindDialog -> aF:
     int DIALOG_W -> a
     int DIALOG_H -> b
     int LABEL_W -> c
@@ -1870,7 +1977,7 @@ dev1503.circlor4j.ui.screen.AddKeyBindDialog -> aC:
     java.lang.String tr(java.lang.String,java.lang.String) -> a
     boolean isPauseScreen() -> isPauseScreen
     boolean isInGameUi() -> isInGameUi
-dev1503.circlor4j.ui.screen.FilePickerScreen -> aD:
+dev1503.circlor4j.ui.screen.FilePickerScreen -> aG:
     int SIDE -> a
     int LIST_TOP -> b
     int ROW_HEIGHT -> c
@@ -1914,7 +2021,7 @@ dev1503.circlor4j.ui.screen.FilePickerScreen -> aD:
     boolean isPauseScreen() -> isPauseScreen
     boolean isInGameUi() -> isInGameUi
     boolean lambda$listJsonFiles$0(java.nio.file.Path) -> a
-dev1503.circlor4j.ui.screen.FilePickerScreen$Mode -> aD$a:
+dev1503.circlor4j.ui.screen.FilePickerScreen$Mode -> aG$a:
     dev1503.circlor4j.ui.screen.FilePickerScreen$Mode LOAD -> LOAD
     dev1503.circlor4j.ui.screen.FilePickerScreen$Mode SAVE -> SAVE
     dev1503.circlor4j.ui.screen.FilePickerScreen$Mode[] $VALUES -> a
@@ -1923,7 +2030,7 @@ dev1503.circlor4j.ui.screen.FilePickerScreen$Mode -> aD$a:
     void <init>(java.lang.String,int) -> <init>
     dev1503.circlor4j.ui.screen.FilePickerScreen$Mode[] $values() -> a
     void <clinit>() -> <clinit>
-dev1503.circlor4j.ui.screen.KeyBindScreen -> aE:
+dev1503.circlor4j.ui.screen.KeyBindScreen -> aH:
     int SIDE -> a
     int LIST_TOP -> b
     int ROW_HEIGHT -> c
