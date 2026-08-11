@@ -17,7 +17,7 @@ public class Toggle extends Component {
 	public static final int HIGHLIGHT_COLOR = 0xFF2697F3;
 
 	private static final int HOVER_COLOR = 0x40FFFFFF;
-	private static final int ENABLED_BG_COLOR = 0x552697F3;
+	private static final int ENABLED_BG_COLOR = 0x2A2697F3;
 	private static final int TEXT_COLOR = 0xFFAAAAAA;
 	private static final int ENABLED_TEXT_COLOR = 0xFF2697F3;
 

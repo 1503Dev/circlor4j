@@ -3,6 +3,8 @@
 	"package": "dev1503.circlor4j.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
+		"NoParticlesClientLevelMixin",
+		"NoParticlesParticleEngineMixin",
 		"MinecraftClientMixin",
 		"KeyboardHandlerMixin",
 		"KeyMappingAccessor",
