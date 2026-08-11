@@ -5,7 +5,6 @@ import dev1503.circlor4j.client.module.ModuleCategory;
 import dev1503.circlor4j.ui.StatusManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.protocol.game.ServerboundContainerClickPacket;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -53,8 +52,6 @@ public class AutoTotemModule extends Module {
 		int containerId = mc.player.inventoryMenu.containerId;
 		int stateId = mc.player.inventoryMenu.getStateId();
 
-		boolean offhandEmpty = mc.player.getOffhandItem().isEmpty();
-
 		mc.player.connection.send(new ServerboundContainerClickPacket(
 			containerId, stateId, (short) invSlot, (byte) 0, ContainerInput.PICKUP,
 			it.unimi.dsi.fastutil.ints.Int2ObjectMaps.emptyMap(),
@@ -65,18 +62,10 @@ public class AutoTotemModule extends Module {
 			it.unimi.dsi.fastutil.ints.Int2ObjectMaps.emptyMap(),
 			net.minecraft.network.HashedStack.EMPTY
 		));
-
-		ItemStack totem = mc.player.getInventory().getItem(invSlot).copy();
-		ItemStack offItem = mc.player.getOffhandItem().copy();
-
-		if (!offhandEmpty) {
-			mc.player.connection.send(new ServerboundContainerClickPacket(
-				containerId, stateId, (short) invSlot, (byte) 0, ContainerInput.PICKUP,
-				it.unimi.dsi.fastutil.ints.Int2ObjectMaps.emptyMap(),
-				net.minecraft.network.HashedStack.EMPTY
-			));
-			mc.player.getInventory().setItem(invSlot, offItem);
-		}
-		mc.player.setItemInHand(InteractionHand.OFF_HAND, totem);
+		mc.player.connection.send(new ServerboundContainerClickPacket(
+			containerId, stateId, (short) invSlot, (byte) 0, ContainerInput.PICKUP,
+			it.unimi.dsi.fastutil.ints.Int2ObjectMaps.emptyMap(),
+			net.minecraft.network.HashedStack.EMPTY
+		));
 	}
 }
