@@ -3,15 +3,15 @@
 	"id": "circlor4j",
 	"version": "${version}",
 	"name": "Circlor4J",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "A utility mod for Minecraft",
 	"authors": [
 		"Me!"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://circlor.1503dev.top/circlor4j",
+		"sources": "https://github.com/1503dev/circlor4j"
 	},
-	"license": "CC0-1.0",
+	"license": "GPL-3.0",
 	"icon": "assets/circlor4j/icon.png",
 	"environment": "client",
 	"entrypoints": {
