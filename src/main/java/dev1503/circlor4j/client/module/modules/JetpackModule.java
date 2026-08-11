@@ -9,8 +9,14 @@ import net.minecraft.world.phys.Vec3;
 
 /** Jetpack: while enabled, applies momentum in the direction you are looking. */
 public class JetpackModule extends Module {
+	public static final String ID = "jetpack";
+
 	public JetpackModule(StatusManager status) {
-		super(status, "jetpack", "Jetpack", "Applies momentum in the direction you are looking", ModuleCategory.MOVEMENT);
+		super(status, ID, "Jetpack", "Applies momentum in the direction you are looking", ModuleCategory.MOVEMENT);
+	}
+
+	public static boolean isActive() {
+		return StatusManager.getInstance().getBoolean(ID + "/enabled", false);
 	}
 
 	@Override

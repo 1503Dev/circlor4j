@@ -22,6 +22,7 @@
 		"AutoJumpLocalPlayerMixin",
 		"FlyLocalPlayerMixin",
 		"FlyTravelMixin",
+		"JetpackTravelMixin",
 		"LivingEntityAccessor",
 		"LowFireScreenEffectMixin",
 		"NoHurtCamGameRendererMixin",

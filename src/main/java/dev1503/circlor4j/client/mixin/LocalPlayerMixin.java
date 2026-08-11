@@ -1,6 +1,7 @@
 package dev1503.circlor4j.client.mixin;
 
 import dev1503.circlor4j.client.module.modules.FastStopModule;
+import dev1503.circlor4j.client.module.modules.JetpackModule;
 import dev1503.circlor4j.client.module.modules.NoFallModule;
 import dev1503.circlor4j.client.module.modules.NoSlowDownModule;
 import net.minecraft.client.player.LocalPlayer;
@@ -52,6 +53,9 @@ public abstract class LocalPlayerMixin {
 		}
 		LocalPlayer player = (LocalPlayer) (Object) this;
 		if (player.isInWater() || player.isInLava()) {
+			return;
+		}
+		if (JetpackModule.isActive()) {
 			return;
 		}
 		if (player.input.keyPresses.forward() || player.input.keyPresses.backward()
