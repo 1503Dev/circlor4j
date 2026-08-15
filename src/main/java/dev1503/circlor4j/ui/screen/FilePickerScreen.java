@@ -2,6 +2,8 @@ package dev1503.circlor4j.ui.screen;
 
 import dev1503.circlor4j.client.keybind.KeyBindManager;
 import dev1503.circlor4j.i18n.I18n;
+import dev1503.circlor4j.ui.component.Button;
+import dev1503.circlor4j.ui.component.TextButton;
 import dev1503.circlor4j.ui.component.UiText;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,6 +44,7 @@ public class FilePickerScreen extends Screen {
 
 	private final Screen returnScreen;
 	private final Mode mode;
+	private final Button saveButton;
 	private String filename = "default";
 	private boolean filenameFocused;
 	private int scroll;
@@ -50,6 +53,7 @@ public class FilePickerScreen extends Screen {
 		super(Component.literal(mode == Mode.LOAD ? "Load Keybinds" : "Save Keybinds"));
 		this.returnScreen = returnScreen;
 		this.mode = mode;
+		this.saveButton = new TextButton(tr("ui.keybinds.save", "Save"), 0, 0, BTN_W, BTN_H, this::doSave);
 	}
 
 	@Override
@@ -104,10 +108,6 @@ public class FilePickerScreen extends Screen {
 		return mx >= this.saveFieldX() && mx < this.saveFieldX() + this.saveFieldW() && my >= this.saveFieldY() && my < this.saveFieldY() + SAVE_FIELD_H;
 	}
 
-	private boolean inSaveBtn(int mx, int my) {
-		return mx >= this.saveBtnX() && mx < this.saveBtnX() + BTN_W && my >= this.saveBtnY() && my < this.saveBtnY() + BTN_H;
-	}
-
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		if (event.button() != 0) {
@@ -120,8 +120,7 @@ public class FilePickerScreen extends Screen {
 			this.filenameFocused = true;
 			return true;
 		}
-		if (this.mode == Mode.SAVE && this.inSaveBtn(mx, my)) {
-			this.doSave();
+		if (this.mode == Mode.SAVE && this.saveButton.mouseClicked(event)) {
 			return true;
 		}
 
@@ -234,12 +233,8 @@ public class FilePickerScreen extends Screen {
 			graphics.outline(this.saveFieldX(), this.saveFieldY(), this.saveFieldW(), SAVE_FIELD_H, BORDER_COLOR);
 			UiText.scaledText(graphics, this.font, fieldText, this.saveFieldX() + 3, UiText.centerY(this.saveFieldY(), SAVE_FIELD_H), VALUE_COLOR);
 
-			String saveLabel = tr("ui.keybinds.save", "Save");
-			boolean hovered = this.inSaveBtn(mouseX, mouseY);
-			graphics.fill(this.saveBtnX(), this.saveBtnY(), this.saveBtnX() + BTN_W, this.saveBtnY() + BTN_H, hovered ? 0xFF3A6EA5 : 0xFF222222);
-			graphics.outline(this.saveBtnX(), this.saveBtnY(), BTN_W, BTN_H, BORDER_COLOR);
-			int textX = this.saveBtnX() + BTN_W / 2 - UiText.scaledWidth(this.font, saveLabel) / 2;
-			UiText.scaledText(graphics, this.font, saveLabel, textX, UiText.centerY(this.saveBtnY(), BTN_H), VALUE_COLOR);
+			this.saveButton.setPosition(this.saveBtnX(), this.saveBtnY());
+			this.saveButton.render(graphics, this.font, mouseX, mouseY);
 		}
 	}
 

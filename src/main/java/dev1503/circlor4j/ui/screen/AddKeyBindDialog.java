@@ -4,6 +4,8 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev1503.circlor4j.client.keybind.KeyBind;
 import dev1503.circlor4j.client.keybind.KeyBindManager;
 import dev1503.circlor4j.i18n.I18n;
+import dev1503.circlor4j.ui.component.Button;
+import dev1503.circlor4j.ui.component.TextButton;
 import dev1503.circlor4j.ui.component.UiText;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -35,10 +37,11 @@ public class AddKeyBindDialog extends Screen {
 	private static final int TITLE_COLOR = 0xFFFFFFFF;
 	private static final int LABEL_COLOR = 0xFFAAAAAA;
 	private static final int VALUE_COLOR = 0xFFFFFFFF;
-	private static final int BTN_TEXT = 0xFFFFFFFF;
 
 	private final Screen returnScreen;
 	private final KeyBind editTarget;
+	private final Button addButton;
+	private final Button cancelButton;
 	private boolean capturing;
 	private InputConstants.Key capturedKey;
 	private boolean capturedShift;
@@ -57,6 +60,8 @@ public class AddKeyBindDialog extends Screen {
 		super(Component.literal("Add Keybind"));
 		this.returnScreen = returnScreen;
 		this.editTarget = editTarget;
+		this.addButton = new TextButton(tr("ui.keybinds.add", "Add"), 0, 0, BTN_W, BTN_H, this::addBind);
+		this.cancelButton = new TextButton(tr("ui.keybinds.cancel", "Cancel"), 0, 0, BTN_W, BTN_H, this::onClose);
 		if (editTarget != null) {
 			this.capturedKey = editTarget.getKey();
 			this.capturedShift = editTarget.hasShift();
@@ -177,12 +182,10 @@ public class AddKeyBindDialog extends Screen {
 			}
 			this.modeDropdownOpen = false;
 		}
-		if (this.inRect(mx, my, this.addX(), this.buttonsY(), BTN_W, BTN_H)) {
-			this.addBind();
+		if (this.addButton.mouseClicked(event)) {
 			return true;
 		}
-		if (this.inRect(mx, my, this.cancelX(), this.buttonsY(), BTN_W, BTN_H)) {
-			this.onClose();
+		if (this.cancelButton.mouseClicked(event)) {
 			return true;
 		}
 		this.functionFocused = false;
@@ -293,8 +296,11 @@ public class AddKeyBindDialog extends Screen {
 		String confirmLabel = this.editTarget != null
 			? tr("ui.keybinds.save", "Save")
 			: tr("ui.keybinds.add", "Add");
-		this.drawButton(graphics, confirmLabel, this.addX(), this.buttonsY(), BTN_W, BTN_H, mouseX, mouseY);
-		this.drawButton(graphics, tr("ui.keybinds.cancel", "Cancel"), this.cancelX(), this.buttonsY(), BTN_W, BTN_H, mouseX, mouseY);
+		this.addButton.setLabel(confirmLabel);
+		this.addButton.setPosition(this.addX(), this.buttonsY());
+		this.cancelButton.setPosition(this.cancelX(), this.buttonsY());
+		this.addButton.render(graphics, this.font, mouseX, mouseY);
+		this.cancelButton.render(graphics, this.font, mouseX, mouseY);
 	}
 
 	private String comboName() {
@@ -327,14 +333,6 @@ public class AddKeyBindDialog extends Screen {
 			graphics.fill(x, y, x + FIELD_W, y + FIELD_H, HOVER_COLOR);
 		}
 		UiText.scaledText(graphics, this.font, label, x + 3, UiText.centerY(y, FIELD_H), VALUE_COLOR);
-	}
-
-	private void drawButton(GuiGraphicsExtractor graphics, String label, int x, int y, int w, int h, int mouseX, int mouseY) {
-		boolean hovered = this.inRect(mouseX, mouseY, x, y, w, h);
-		graphics.fill(x, y, x + w, y + h, hovered ? 0xFF3A6EA5 : 0xFF222222);
-		graphics.outline(x, y, w, h, BORDER_COLOR);
-		int textX = x + w / 2 - UiText.scaledWidth(this.font, label) / 2;
-		UiText.scaledText(graphics, this.font, label, textX, UiText.centerY(y, h), BTN_TEXT);
 	}
 
 	private static String tr(String key, String fallback) {

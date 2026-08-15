@@ -39,24 +39,27 @@ public final class XrayRenderer {
 	private static int cachedCenterZ;
 	private static int cachedRadius;
 	private static int cachedVerticalRadius;
+	private static boolean cachedFastRender;
 
 	private XrayRenderer() {
 	}
 
-	private static boolean isDirty(Minecraft mc, BlockPos center, int radius, int verticalRadius, int version) {
+	private static boolean isDirty(Minecraft mc, BlockPos center, int radius, int verticalRadius, int version, boolean fastRender) {
 		return cachedVersion != version
 			|| cachedRadius != radius
 			|| cachedVerticalRadius != verticalRadius
+			|| cachedFastRender != fastRender
 			|| cachedCenterX != center.getX()
 			|| cachedCenterY != center.getY()
 			|| cachedCenterZ != center.getZ();
 	}
 
-	private static void rebuild(Minecraft mc, BlockPos center, int radius, int verticalRadius, int version) {
+	private static void rebuild(Minecraft mc, BlockPos center, int radius, int verticalRadius, int version, boolean fastRender) {
 		cachedOutlines.clear();
 		cachedVersion = version;
 		cachedRadius = radius;
 		cachedVerticalRadius = verticalRadius;
+		cachedFastRender = fastRender;
 		cachedCenterX = center.getX();
 		cachedCenterY = center.getY();
 		cachedCenterZ = center.getZ();
@@ -133,6 +136,12 @@ public final class XrayRenderer {
 			Block startBlock = positionToBlock.get(startLong);
 
 			List<VoxelShape> blockShapes = new ArrayList<>();
+			int minCX = Integer.MAX_VALUE;
+			int minCY = Integer.MAX_VALUE;
+			int minCZ = Integer.MAX_VALUE;
+			int maxCX = Integer.MIN_VALUE;
+			int maxCY = Integer.MIN_VALUE;
+			int maxCZ = Integer.MIN_VALUE;
 			Deque<Long> queue = new ArrayDeque<>();
 			queue.add(startLong);
 			visited.add(startLong);
@@ -141,18 +150,27 @@ public final class XrayRenderer {
 				long currentLong = queue.poll();
 				BlockPos pos = BlockPos.of(currentLong);
 
-				boolean hasExposedFace = false;
-				for (int[] offset : NEIGHBORS) {
-					long neighbor = BlockPos.asLong(pos.getX() + offset[0], pos.getY() + offset[1], pos.getZ() + offset[2]);
-					if (!orePositions.contains(neighbor)) {
-						hasExposedFace = true;
-						break;
+				if (fastRender) {
+					minCX = Math.min(minCX, pos.getX());
+					minCY = Math.min(minCY, pos.getY());
+					minCZ = Math.min(minCZ, pos.getZ());
+					maxCX = Math.max(maxCX, pos.getX());
+					maxCY = Math.max(maxCY, pos.getY());
+					maxCZ = Math.max(maxCZ, pos.getZ());
+				} else {
+					boolean hasExposedFace = false;
+					for (int[] offset : NEIGHBORS) {
+						long neighbor = BlockPos.asLong(pos.getX() + offset[0], pos.getY() + offset[1], pos.getZ() + offset[2]);
+						if (!orePositions.contains(neighbor)) {
+							hasExposedFace = true;
+							break;
+						}
 					}
-				}
 
-				if (hasExposedFace) {
-					blockShapes.add(Shapes.box(pos.getX(), pos.getY(), pos.getZ(),
-						pos.getX() + 1.0, pos.getY() + 1.0, pos.getZ() + 1.0));
+					if (hasExposedFace) {
+						blockShapes.add(Shapes.box(pos.getX(), pos.getY(), pos.getZ(),
+							pos.getX() + 1.0, pos.getY() + 1.0, pos.getZ() + 1.0));
+					}
 				}
 
 				for (int[] offset : NEIGHBORS) {
@@ -164,6 +182,14 @@ public final class XrayRenderer {
 						}
 					}
 				}
+			}
+
+			if (fastRender) {
+				cachedOutlines.add(new Outline(
+					Shapes.box(minCX, minCY, minCZ, maxCX + 1.0, maxCY + 1.0, maxCZ + 1.0),
+					XrayModule.getBlockColor(startBlock)
+				));
+				continue;
 			}
 
 			if (blockShapes.isEmpty()) {
@@ -188,11 +214,12 @@ public final class XrayRenderer {
 		}
 		int radius = XrayModule.getRadius();
 		int verticalRadius = XrayModule.getVerticalRadius();
+		boolean fastRender = XrayModule.isFastRender();
 		int version = XrayModule.getBlockCacheVersion();
 		BlockPos center = mc.player.blockPosition();
 
-		if (isDirty(mc, center, radius, verticalRadius, version)) {
-			rebuild(mc, center, radius, verticalRadius, version);
+		if (isDirty(mc, center, radius, verticalRadius, version, fastRender)) {
+			rebuild(mc, center, radius, verticalRadius, version, fastRender);
 		}
 
 		for (Outline outline : cachedOutlines) {

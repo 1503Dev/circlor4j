@@ -36,7 +36,7 @@ public class CategoryWindow {
 	private static final int MIN_HEIGHT = HEADER_HEIGHT + ROW_HEIGHT + BOTTOM_PADDING;
 	private static final int DEFAULT_HEIGHT = (HEADER_HEIGHT + MAX_VISIBLE_ROWS * ROW_HEIGHT + BOTTOM_PADDING) * 2;
 
-	private static final int BODY_COLOR = 0xD0101010;
+	private static final int BODY_COLOR = 0x8B101010;
 	private static final int HEADER_COLOR = 0xE0202020;
 	private static final int HEADER_ACTIVE_COLOR = 0xE0505050;
 	private static final int OUTLINE_COLOR = 0xFF3A3A3A;
@@ -62,6 +62,7 @@ public class CategoryWindow {
 	private int height;
 	private int screenWidth = 640;
 	private int screenHeight = 480;
+	private int minY;
 	private int scroll;
 	private boolean dragging;
 	private boolean collapsed;
@@ -87,9 +88,6 @@ public class CategoryWindow {
 			Dropdown language = this.createLanguageDropdown(status, x, y);
 			this.rootRows.add(language);
 			status.addWidget(language);
-			ActionButton keybinds = new ActionButton(status, KEYBINDS_ACTION_PATH, tr("ui.keybinds.name", "Keybinds"), x, y, WIDTH, ROW_HEIGHT);
-			this.rootRows.add(keybinds);
-			status.addWidget(keybinds);
 		}
 		for (Module module : ModuleManager.byCategory(category)) {
 			if (!module.isShownInGui()) {
@@ -473,10 +471,15 @@ public class CategoryWindow {
 		this.screenHeight = height;
 	}
 
-	/** Pulls the window back so the title bar stays within the MC screen. */
+	/** Minimum Y the window may be dragged/resized to (e.g. below the tab bar). */
+	public void setMinY(int minY) {
+		this.minY = minY;
+	}
+
+	/** Pulls the window back so the title bar stays within the MC screen (and below minY). */
 	public void clampToScreen() {
 		this.x = Math.max(0, Math.min(this.x, Math.max(0, this.screenWidth - this.width)));
-		this.y = Math.max(0, Math.min(this.y, Math.max(0, this.screenHeight - HEADER_HEIGHT)));
+		this.y = Math.max(this.minY, Math.min(this.y, Math.max(this.minY, this.screenHeight - HEADER_HEIGHT)));
 	}
 
 	private int contentHeight() {

@@ -47,8 +47,6 @@ public class BlockList extends Component {
 	private static final int LABEL_COLOR = 0xFFAAAAAA;
 	private static final int FIELD_BG_COLOR = 0xFF222222;
 	private static final int FIELD_ACTIVE_COLOR = 0xFF3A6EA5;
-	private static final int ADD_COLOR = 0xFF2697F3;
-	private static final int ADD_HOVER_COLOR = 0xFF4EA3FF;
 	private static final int ITEM_BG_COLOR = 0x20FFFFFF;
 	private static final int ITEM_HOVER_COLOR = 0x40FFFFFF;
 	private static final int ITEM_ENABLED_COLOR = 0x332697F3;
@@ -61,6 +59,7 @@ public class BlockList extends Component {
 
 	private final StatusManager status;
 	private final String label;
+	private final Button addButton;
 	private int x;
 	private int y;
 	private int width;
@@ -80,6 +79,7 @@ public class BlockList extends Component {
 		super(path);
 		this.status = status;
 		this.label = label;
+		this.addButton = new TextButton("+", 0, 0, 12, HEADER_H - 2, this::commitAdd);
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -185,15 +185,7 @@ public class BlockList extends Component {
 		return mx >= wx + PAD && mx < wx + PAD + fieldW && my >= wy + PAD && my < wy + PAD + HEADER_H;
 	}
 
-	private boolean inAddButton(int mx, int my) {
-		int wx = this.winX();
-		int wy = this.winY();
-		int bx = wx + WIN_W - PAD - 12;
-		return mx >= bx && mx < bx + 12 && my >= wy + PAD + 1 && my < wy + PAD + HEADER_H - 1;
-	}
-
-	private int listTop() {
-		return this.winY() + PAD + HEADER_H + PAD;
+	private int listTop() {		return this.winY() + PAD + HEADER_H + PAD;
 	}
 
 	private int visibleCapacity() {
@@ -236,8 +228,7 @@ public class BlockList extends Component {
 			this.inputActive = true;
 			return true;
 		}
-		if (this.inAddButton(mx, my)) {
-			this.commitAdd();
+		if (this.addButton.mouseClicked(event)) {
 			return true;
 		}
 		this.inputActive = false;
@@ -415,13 +406,8 @@ public class BlockList extends Component {
 		}
 		UiText.scaledText(graphics, font, display, textX, textY, LABEL_COLOR);
 
-		int bx = wx + WIN_W - PAD - 12;
-		int by = wy + PAD + 1;
-		boolean hover = this.inAddButton(mouseX, mouseY);
-		graphics.fill(bx, by, bx + 12, by + HEADER_H - 2, hover ? ADD_HOVER_COLOR : ADD_COLOR);
-		graphics.outline(bx, by, 12, HEADER_H - 2, WIN_BORDER_COLOR);
-		int plusX = bx + 6 - UiText.scaledWidth(font, "+") / 2;
-		UiText.scaledText(graphics, font, "+", plusX, UiText.centerY(by, HEADER_H - 2), COUNT_COLOR);
+		this.addButton.setPosition(wx + WIN_W - PAD - 12, wy + PAD + 1);
+		this.addButton.render(graphics, font, mouseX, mouseY);
 	}
 
 	private void renderList(GuiGraphicsExtractor graphics, Font font, int mouseX, int mouseY, int wx, int wy) {

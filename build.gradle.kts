@@ -12,6 +12,15 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
+	maven {
+		url = uri("https://maven.minecraftforge.net/")
+	}
+	maven {
+		url = uri("https://repo.spongepowered.org/maven")
+	}
+	maven {
+		url = uri("https://maven.architectury.dev/")
+	}
 }
 
 loom {
@@ -29,9 +38,16 @@ dependencies {
 	minecraft("com.mojang:minecraft:${providers.gradleProperty("minecraft_version").get()}")
 	implementation("net.fabricmc:fabric-loader:${providers.gradleProperty("loader_version").get()}")
 
+//	implementation("net.minecraftforge:forge:26.2-65.1.1")
+//	annotationProcessor("net.minecraftforge:eventbus-validator:7.0.5")
+
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	//implementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
 	compileOnly(files("libs/minecraft.jar"))
+	// Source: https://mvnrepository.com/artifact/dev.architectury.loom/dev.architectury.loom.gradle.plugin
+//	implementation("dev.architectury.loom:dev.architectury.loom.gradle.plugin:1.17.491")
+//	// Source: https://mvnrepository.com/artifact/architectury-plugin/architectury-plugin.gradle.plugin
+//	implementation("architectury-plugin:architectury-plugin.gradle.plugin:3.5.169")
 }
 
 tasks.processResources {

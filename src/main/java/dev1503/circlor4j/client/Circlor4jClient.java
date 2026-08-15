@@ -34,6 +34,8 @@ import dev1503.circlor4j.client.module.modules.NameTagModule;
 import dev1503.circlor4j.client.module.modules.KillAuraModule;
 import dev1503.circlor4j.client.module.modules.LanguageModule;
 import dev1503.circlor4j.client.module.modules.NoCameraClipModule;
+import dev1503.circlor4j.client.module.modules.NoClipModule;
+import dev1503.circlor4j.client.module.modules.NoFogModule;
 import dev1503.circlor4j.client.module.modules.NoParticlesModule;
 import dev1503.circlor4j.client.module.modules.NoFallModule;
 import dev1503.circlor4j.client.module.modules.NoSlowDownModule;
@@ -116,6 +118,8 @@ public final class Circlor4jClient {
 		ModuleManager.register(new LowFireModule(status));
 		ModuleManager.register(new NoHurtCamModule(status));
 		ModuleManager.register(new NoCameraClipModule(status));
+		ModuleManager.register(new NoClipModule(status));
+		ModuleManager.register(new NoFogModule(status));
 		ModuleManager.register(new NoParticlesModule(status));
 		ModuleManager.register(new NoFallModule(status));
 		ModuleManager.register(new NoSlowDownModule(status));

@@ -27,7 +27,9 @@
 		"JetpackTravelMixin",
 		"LivingEntityAccessor",
 		"LowFireScreenEffectMixin",
+		"NoFogGameRendererMixin",
 		"NoHurtCamGameRendererMixin",
+		"NoClipPlayerMixin",
 		"TimerDeltaTrackerMixin",
 		"WebBlockMixin"
 	],

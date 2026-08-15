@@ -1,5 +1,6 @@
 package dev1503.circlor4j.ui.clickgui;
 
+import dev1503.circlor4j.ModStatic;
 import dev1503.circlor4j.client.config.ModStorage;
 import dev1503.circlor4j.client.module.ModuleCategory;
 import dev1503.circlor4j.client.module.modules.ClickGuiModule;
@@ -7,11 +8,14 @@ import dev1503.circlor4j.client.update.UpdateChecker;
 import dev1503.circlor4j.i18n.I18n;
 import dev1503.circlor4j.ui.StatusManager;
 import dev1503.circlor4j.ui.component.BlockList;
+import dev1503.circlor4j.ui.component.Button;
 import dev1503.circlor4j.ui.component.CategoryWindow;
 import dev1503.circlor4j.ui.component.ColorList;
 import dev1503.circlor4j.ui.component.ColorPicker;
 import dev1503.circlor4j.ui.component.Dropdown;
+import dev1503.circlor4j.ui.component.KeyBindPanel;
 import dev1503.circlor4j.ui.component.Slider;
+import dev1503.circlor4j.ui.component.TextButton;
 import dev1503.circlor4j.ui.component.UiText;
 import java.awt.Desktop;
 import java.net.URI;
@@ -19,8 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
@@ -29,7 +31,28 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 public class ClickGuiScreen extends Screen {
+	private static final int TAB_TOP = 0;
+	private static final int TAB_HEIGHT = 14;
+	private static final int TAB_GAP = 0;
+	private static final int TAB_PAD_X = 12;
+	private static final int TAB_LINE_HEIGHT = 1;
+	private static final int LIST_TOP = TAB_TOP + TAB_HEIGHT + 8;
+	private static final ModuleCategory[] DEFAULT_CATEGORY_ORDER = {
+		ModuleCategory.MOVEMENT,
+		ModuleCategory.PLAYER,
+		ModuleCategory.RENDER,
+		ModuleCategory.COMBAT,
+		ModuleCategory.MISC,
+		ModuleCategory.CIRCLOR
+	};
+
+	private static final int TAB_HIGHLIGHT = 0xFF2697F3;
+	private static final int TAB_TEXT_IDLE = 0xFFAAAAAA;
+	private static final int TAB_TEXT_HOVER = 0xFFDDDDDD;
+
 	private final List<CategoryWindow> windows = new ArrayList<>();
+	private final KeyBindPanel keyBindPanel = new KeyBindPanel(this);
+	private int activeTab;
 	private Dropdown activeMenu;
 	private ColorPicker activePicker;
 	private BlockList activeBlockList;
@@ -47,12 +70,14 @@ public class ClickGuiScreen extends Screen {
 	protected void init() {
 		super.init();
 		this.buildWindows(ModStorage.loadLayout());
-		Button tmp = Button.builder(
-			Component.literal(I18n.t("clickgui.update_available", "New version is ready")),
-			btn -> this.openUpdateUrl()
-		).bounds(0, 0, 10, 10).build();
-		this.updateButton = tmp;
-		this.addRenderableWidget(this.updateButton);
+		this.updateButton = new TextButton(
+			I18n.t("clickgui.update_available", "New version is ready"),
+			0,
+			0,
+			10,
+			10,
+			this::openUpdateUrl
+		);
 	}
 
 	/** Rebuilds all category windows (re-resolving localisation) when the language changes. */
@@ -81,9 +106,9 @@ public class ClickGuiScreen extends Screen {
 
 	private void buildWindows(Map<String, ModStorage.WindowLayout> layout) {
 		this.windows.clear();
-		ModuleCategory[] categories = ModuleCategory.values();
+		ModuleCategory[] categories = DEFAULT_CATEGORY_ORDER;
 		int startX = 10;
-		int startY = 10;
+		int startY = TAB_TOP + TAB_HEIGHT + 6;
 		for (int i = 0; i < categories.length; i++) {
 			ModuleCategory category = categories[i];
 			ModStorage.WindowLayout saved = layout != null ? layout.get(category.name()) : null;
@@ -96,6 +121,7 @@ public class ClickGuiScreen extends Screen {
 				window.setExpandedPaths(saved.expanded());
 			}
 			window.setScreenSize(this.width, this.height);
+			window.setMinY(TAB_TOP + TAB_HEIGHT);
 			window.clampToScreen();
 			this.windows.add(window);
 		}
@@ -125,6 +151,56 @@ public class ClickGuiScreen extends Screen {
 		graphics.fill(0, 0, this.width, this.height, ClickGuiModule.getBackgroundColor());
 	}
 
+	private String tabLabel(int tab) {
+		if (tab == 1) {
+			String value = I18n.t("ui.keybinds.name");
+			return value.equals("ui.keybinds.name") ? "Keybinds" : value;
+		}
+		String value = I18n.t("clickgui.tab.modules");
+		return value.equals("clickgui.tab.modules") ? "Modules" : value;
+	}
+
+	private int[] tabRects() {
+		int label0W = UiText.scaledWidth(this.font, this.tabLabel(0));
+		int label1W = UiText.scaledWidth(this.font, this.tabLabel(1));
+		int w = Math.max(label0W, label1W) + TAB_PAD_X * 2;
+		int total = w * 2 + TAB_GAP;
+		int startX = (this.width - total) / 2;
+		return new int[] {startX, startX + w + TAB_GAP, w, w};
+	}
+
+	private void renderTabbar(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+		int[] r = this.tabRects();
+		this.renderTab(graphics, this.tabLabel(0), r[0], r[2], mouseX, mouseY, this.activeTab == 0);
+		this.renderTab(graphics, this.tabLabel(1), r[1], r[3], mouseX, mouseY, this.activeTab == 1);
+	}
+
+	private void renderTab(GuiGraphicsExtractor graphics, String label, int x, int w, int mouseX, int mouseY, boolean active) {
+		boolean hovered = mouseX >= x && mouseX < x + w && mouseY >= TAB_TOP && mouseY < TAB_TOP + TAB_HEIGHT;
+		int textColor = active ? TAB_HIGHLIGHT : (hovered ? TAB_TEXT_HOVER : TAB_TEXT_IDLE);
+		int textX = x + w / 2 - UiText.scaledWidth(this.font, label) / 2;
+		UiText.scaledText(graphics, this.font, label, textX, UiText.centerY(TAB_TOP, TAB_HEIGHT), textColor);
+		if (active) {
+			graphics.fill(x, TAB_TOP + TAB_HEIGHT - TAB_LINE_HEIGHT, x + w, TAB_TOP + TAB_HEIGHT, TAB_HIGHLIGHT);
+		}
+	}
+
+	private void setTab(int tab) {
+		if (this.activeTab == tab) {
+			return;
+		}
+		if (tab == 0) {
+			for (CategoryWindow window : this.windows) {
+				window.closeMenus();
+			}
+			this.activeMenu = null;
+			this.activePicker = null;
+			this.activeBlockList = null;
+			this.activeColorList = null;
+		}
+		this.activeTab = tab;
+	}
+
 	private void saveLayout() {
 		Map<String, ModStorage.WindowLayout> layout = new HashMap<>();
 		for (CategoryWindow window : this.windows) {
@@ -152,6 +228,35 @@ public class ClickGuiScreen extends Screen {
 		}
 		this.renderedLang = I18n.lang;
 
+		if (this.activeTab == 1) {
+			this.keyBindPanel.render(graphics, this.font, this.width, this.height, LIST_TOP, mouseX, mouseY);
+		} else {
+			this.renderModulesTab(graphics, mouseX, mouseY);
+		}
+
+		this.renderTabbar(graphics, mouseX, mouseY);
+
+		String version = ModStatic.VERSION;
+		String versionText = "Circlor4J v" + version;
+		int versionWidth = UiText.scaledWidth(this.font, versionText);
+		UiText.scaledText(graphics, this.font, versionText, this.width / 2 - versionWidth / 2, this.height - 16, 0xFFAAAAAA);
+
+		String updateText = I18n.t("clickgui.update_available", "New version is ready");
+		int textW = this.font.width(updateText);
+		int textH = this.font.lineHeight;
+		int padding = 2;
+		int boxW = textW + padding * 2;
+		int boxH = textH + padding * 2;
+		int boxX = this.width - boxW - 4;
+		int boxY = this.height - boxH - 6;
+		this.updateButton.setPosition(boxX, boxY);
+		this.updateButton.setSize(boxW, boxH);
+		if (UpdateChecker.hasUpdate()) {
+			this.updateButton.render(graphics, this.font, mouseX, mouseY);
+		}
+	}
+
+	private void renderModulesTab(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
 		this.activeMenu = this.findOpenDropdown();
 		this.activePicker = this.findOpenColorPicker();
 		this.activeBlockList = this.findOpenBlockList();
@@ -189,52 +294,28 @@ public class ClickGuiScreen extends Screen {
 				}
 			}
 		}
-
-		String version = FabricLoader.getInstance()
-			.getModContainer("circlor4j")
-			.map(c -> c.getMetadata().getVersion().getFriendlyString())
-			.orElse("unknown");
-		String versionText = "Circlor4J v" + version;
-		int versionWidth = UiText.scaledWidth(this.font, versionText);
-		UiText.scaledText(graphics, this.font, versionText, this.width / 2 - versionWidth / 2, this.height - 16, 0xFFAAAAAA);
-
-		String updateText = I18n.t("clickgui.update_available", "New version is ready");
-		int textW = this.font.width(updateText);
-		int textH = this.font.lineHeight;
-		int padding = 2;
-		int boxW = textW + padding * 2;
-		int boxH = textH + padding * 2;
-		int boxX = this.width - boxW - 4;
-		int boxY = this.height - boxH - 6;
-		this.updateButton.setX(boxX);
-		this.updateButton.setY(boxY);
-		this.updateButton.setWidth(boxW);
-		this.updateButton.setHeight(boxH);
-		if (UpdateChecker.hasUpdate()) {
-			graphics.fill(boxX, boxY, boxX + boxW, boxY + boxH, 0x33FFFFFF);
-			graphics.text(this.font, updateText, boxX + padding, boxY + padding, 0xFFFFAA00);
-		}
 	}
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		int mx = (int) event.x();
 		int my = (int) event.y();
-		if (this.updateButton != null && UpdateChecker.hasUpdate()) {
-			String updateText = I18n.t("clickgui.update_available", "New version is ready");
-			int textW = this.font.width(updateText);
-			int textH = this.font.lineHeight;
-			int padding = 2;
-			int boxW = textW + padding * 2;
-			int boxH = textH + padding * 2;
-			int boxX = this.width - boxW - 4;
-			int boxY = this.height - boxH - 6;
-//			System.out.println("[Circlor4J] click check: mx=" + mx + " my=" + my + " boxX=" + boxX + " boxY=" + boxY + " boxW=" + boxW + " boxH=" + boxH + " hasUpdate=" + UpdateChecker.hasUpdate());
-			if (mx >= boxX && mx <= boxX + boxW && my >= boxY && my <= boxY + boxH) {
-				System.out.println("[Circlor4J] Update box hit!");
-				this.openUpdateUrl();
+		if (this.updateButton != null && UpdateChecker.hasUpdate() && this.updateButton.mouseClicked(event)) {
+			return true;
+		}
+		if (event.button() == 0 && my >= TAB_TOP && my < TAB_TOP + TAB_HEIGHT) {
+			int[] r = this.tabRects();
+			if (mx >= r[0] && mx < r[0] + r[2]) {
+				this.setTab(0);
 				return true;
 			}
+			if (mx >= r[1] && mx < r[1] + r[3]) {
+				this.setTab(1);
+				return true;
+			}
+		}
+		if (this.activeTab == 1) {
+			return this.keyBindPanel.mouseClicked(event, this.width, this.height, LIST_TOP);
 		}
 		if (this.activePicker != null) {
 			if (this.activePicker.mouseClickedWindow(event, this.font)) {
@@ -350,6 +431,9 @@ public class ClickGuiScreen extends Screen {
 
 	@Override
 	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+		if (this.activeTab == 1) {
+			return false;
+		}
 		if (this.activePicker != null && this.activePicker.mouseDraggedWindow((int) event.x(), (int) event.y())) {
 			return true;
 		}
@@ -366,6 +450,9 @@ public class ClickGuiScreen extends Screen {
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
+		if (this.activeTab == 1) {
+			return false;
+		}
 		if (this.activePicker != null) {
 			this.activePicker.mouseReleasedWindow();
 		}
@@ -382,6 +469,10 @@ public class ClickGuiScreen extends Screen {
 	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
 		int mx = (int) x;
 		int my = (int) y;
+		if (this.activeTab == 1) {
+			this.keyBindPanel.mouseScrolled(scrollY, this.width, this.height, LIST_TOP);
+			return true;
+		}
 		if (this.activeBlockList != null && this.activeBlockList.containsWindow(mx, my)) {
 			this.activeBlockList.mouseScrolled(mx, my, scrollY);
 			return true;
@@ -400,6 +491,9 @@ public class ClickGuiScreen extends Screen {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
+		if (this.activeTab == 1) {
+			return this.keyBindPanel.keyPressed(event) || super.keyPressed(event);
+		}
 		if (this.activeBlockList != null && this.activeBlockList.isInputActive()) {
 			return this.activeBlockList.keyPressed(event);
 		}

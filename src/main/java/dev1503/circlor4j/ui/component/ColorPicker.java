@@ -32,9 +32,6 @@ public class ColorPicker extends Component {
 	private static final int WINDOW_BG_COLOR = 0xE0101010;
 	private static final int WINDOW_BORDER_COLOR = 0xFF3A3A3A;
 	private static final int LABEL_COLOR = 0xFFAAAAAA;
-	private static final int BUTTON_COLOR = 0xFF222222;
-	private static final int BUTTON_HOVER_COLOR = 0xFF3A6EA5;
-	private static final int BUTTON_TEXT_COLOR = 0xFFFFFFFF;
 	private static final int CURSOR_DARK = 0xFF000000;
 	private static final int CURSOR_LIGHT = 0xFFFFFFFF;
 
@@ -43,6 +40,7 @@ public class ColorPicker extends Component {
 	private final StatusManager status;
 	private final String label;
 	private final int defaultColor;
+	private final Button confirmButton;
 	private int x;
 	private int y;
 	private int width;
@@ -59,6 +57,9 @@ public class ColorPicker extends Component {
 		this.status = status;
 		this.label = label;
 		this.defaultColor = defaultColor;
+		String confirm = I18n.t("ui.color_picker.confirm");
+		String confirmText = "ui.color_picker.confirm".equals(confirm) ? "OK" : confirm;
+		this.confirmButton = new TextButton(confirmText, 0, 0, this.buttonWidth(), BUTTON_H, this::confirm);
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -159,13 +160,6 @@ public class ColorPicker extends Component {
 		return mx >= this.alphaX() && mx < this.alphaX() + SQUARE && my >= this.alphaY() && my < this.alphaY() + ALPHA_H;
 	}
 
-	private boolean inButton(int mx, int my) {
-		return mx >= this.buttonX()
-			&& mx < this.buttonX() + this.buttonWidth()
-			&& my >= this.buttonY()
-			&& my < this.buttonY() + BUTTON_H;
-	}
-
 	/** Row click (called by the owning CategoryWindow): toggles the popup window. */
 	public boolean mouseClickedRow(MouseButtonEvent event) {
 		if (event.button() != 0 || !this.containsRow((int) event.x(), (int) event.y())) {
@@ -204,10 +198,7 @@ public class ColorPicker extends Component {
 			this.applyAlpha(mx, my);
 			return true;
 		}
-		if (this.inButton(mx, my)) {
-			this.status.setValue(this, this.getPath(), this.workingArgb());
-			this.windowOpen = false;
-			this.dragRegion = DragRegion.NONE;
+		if (this.confirmButton.mouseClicked(event)) {
 			return true;
 		}
 		return true;
@@ -255,6 +246,12 @@ public class ColorPicker extends Component {
 
 	private void applyAlpha(int mx, int my) {
 		this.alpha = Math.max(0, Math.min(255, Math.round((mx - this.alphaX()) / (float) (SQUARE - 1) * 255.0F)));
+	}
+
+	private void confirm() {
+		this.status.setValue(this, this.getPath(), this.workingArgb());
+		this.windowOpen = false;
+		this.dragRegion = DragRegion.NONE;
 	}
 
 	private int workingArgb() {
@@ -404,12 +401,7 @@ public class ColorPicker extends Component {
 
 		int btnX = this.buttonX();
 		int btnY = this.buttonY();
-		boolean hovered = this.inButton(mouseX, mouseY);
-		graphics.fill(btnX, btnY, btnX + this.buttonWidth(), btnY + BUTTON_H, hovered ? BUTTON_HOVER_COLOR : BUTTON_COLOR);
-		graphics.outline(btnX, btnY, this.buttonWidth(), BUTTON_H, WINDOW_BORDER_COLOR);
-		String confirm = I18n.t("ui.color_picker.confirm");
-		String confirmText = "ui.color_picker.confirm".equals(confirm) ? "OK" : confirm;
-		int textX = btnX + this.buttonWidth() / 2 - UiText.scaledWidth(font, confirmText) / 2;
-		UiText.scaledText(graphics, font, confirmText, textX, UiText.centerY(btnY, BUTTON_H), BUTTON_TEXT_COLOR);
+		this.confirmButton.setPosition(btnX, btnY);
+		this.confirmButton.render(graphics, font, mouseX, mouseY);
 	}
 }

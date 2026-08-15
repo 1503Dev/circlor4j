@@ -20,6 +20,7 @@ public class XrayModule extends Module {
 	public static final String COLORS = "colors";
 	private static final String RADIUS = "radius";
 	private static final String VERTICAL_RADIUS = "vertical_radius";
+	private static final String FAST_RENDER = "fast_render";
 
 	private static final String[] DEFAULT_ORES = {
 		"minecraft:coal_ore",
@@ -78,6 +79,7 @@ public class XrayModule extends Module {
 		this.registerColorList(COLORS, "Render Color", BLOCKS);
 		this.registerSlider(RADIUS, "Radius", 1.0, 6.0, 1.0, 2.0);
 		this.registerSlider(VERTICAL_RADIUS, "Vertical Radius", 1.0, 12.0, 1.0, 8.0);
+		this.registerToggle(FAST_RENDER, "Fast Render");
 	}
 
 	@Override
@@ -97,6 +99,10 @@ public class XrayModule extends Module {
 
 	public static int getVerticalRadius() {
 		return (int) StatusManager.getInstance().getDouble(ID + "/" + VERTICAL_RADIUS, 8.0);
+	}
+
+	public static boolean isFastRender() {
+		return StatusManager.getInstance().getBoolean(ID + "/" + FAST_RENDER + "/enabled", false);
 	}
 
 	private static String blocksPrefix() {
