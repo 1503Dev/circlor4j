@@ -20,7 +20,7 @@ public class ZoomModule extends Module {
 	}
 
 	public static boolean isActive() {
-		return StatusManager.getInstance().getBoolean("zoom/enabled", false);
+		return StatusManager.getInstance().getBoolean("zoom/enabled", false) && !HideAllRendersModule.isActive();
 	}
 
 	public static int getFov() {

@@ -16,7 +16,7 @@ public class TrueSightModule extends Module {
 	}
 
 	public static boolean isActive() {
-		return StatusManager.getInstance().getBoolean(ID + "/enabled", false);
+		return StatusManager.getInstance().getBoolean(ID + "/enabled", false) && !HideAllRendersModule.isActive();
 	}
 
 	public static boolean isEntitiesEnabled() {

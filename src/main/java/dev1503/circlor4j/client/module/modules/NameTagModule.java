@@ -7,17 +7,23 @@ import dev1503.circlor4j.ui.StatusManager;
 public class NameTagModule extends Module {
 	public static final String ID = "name_tag";
 	private static final String SHOW_HEALTH = "show_health";
+	private static final String ALLOW_BOTS = "allow_bots";
 
 	public NameTagModule(StatusManager status) {
 		super(status, ID, "NameTag", "Shows player name tags and health above heads", ModuleCategory.RENDER);
 		this.registerToggle(SHOW_HEALTH, "ShowHealth", true);
+		this.registerToggle(ALLOW_BOTS, "AllowBots");
 	}
 
 	public static boolean isActive() {
-		return StatusManager.getInstance().getBoolean(ID + "/enabled", false);
+		return StatusManager.getInstance().getBoolean(ID + "/enabled", false) && !HideAllRendersModule.isActive();
 	}
 
 	public static boolean isShowHealth() {
 		return StatusManager.getInstance().getBoolean(ID + "/" + SHOW_HEALTH + "/enabled", true);
+	}
+
+	public static boolean isAllowBotsEnabled() {
+		return isActive() && StatusManager.getInstance().getBoolean(ID + "/" + ALLOW_BOTS + "/enabled", false);
 	}
 }

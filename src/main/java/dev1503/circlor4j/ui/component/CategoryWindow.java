@@ -129,6 +129,7 @@ public class CategoryWindow {
 					toggle.addChild(dropdown);
 				} else if (setting instanceof Module.ToggleSetting s) {
 					Toggle subToggle = new Toggle(status, s.path(), tr(s.labelKey(), s.labelFallback()), x, y, WIDTH, ROW_HEIGHT);
+					subToggle.setShowCondition(s.showCondition());
 					if (s.parentOption() != null) {
 						Toggle parent = findChildToggle(toggle, module.getId() + "/" + s.parentOption() + "/enabled");
 						if (parent != null) {

@@ -1,6 +1,7 @@
 package dev1503.circlor4j.client.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev1503.circlor4j.client.module.modules.AntiBotModule;
 import dev1503.circlor4j.client.module.modules.EspModule;
 import dev1503.circlor4j.client.module.modules.XrayModule;
 import dev1503.circlor4j.client.render.EspRenderType;
@@ -77,6 +78,9 @@ public abstract class LevelRendererMixin {
 			int color;
 			if (entity instanceof Player) {
 				if (!players) {
+					continue;
+				}
+				if (!EspModule.isAllowBotsEnabled() && AntiBotModule.isBot(entity)) {
 					continue;
 				}
 				color = EspModule.getPlayersColor();

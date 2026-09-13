@@ -10,6 +10,6 @@ public class AntiDebuffModule extends Module {
 	}
 
 	public static boolean isActive() {
-		return StatusManager.getInstance().getBoolean("anti_debuff/enabled", false);
+		return StatusManager.getInstance().getBoolean("anti_debuff/enabled", false) && !HideAllRendersModule.isActive();
 	}
 }

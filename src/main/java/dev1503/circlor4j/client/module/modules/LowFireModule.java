@@ -10,6 +10,6 @@ public class LowFireModule extends Module {
 	}
 
 	public static boolean isActive() {
-		return StatusManager.getInstance().getBoolean("low_fire/enabled", false);
+		return StatusManager.getInstance().getBoolean("low_fire/enabled", false) && !HideAllRendersModule.isActive();
 	}
 }

@@ -6,6 +6,7 @@
 		"NoParticlesClientLevelMixin",
 		"NoParticlesParticleEngineMixin",
 		"PacketDecoderMixin",
+		"SafeWalkPlayerMixin",
 		"MinecraftClientMixin",
 		"KeyboardHandlerMixin",
 		"KeyMappingAccessor",

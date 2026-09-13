@@ -114,7 +114,7 @@ public class FreecamModule extends Module {
 	}
 
 	public static boolean isActive() {
-		return StatusManager.getInstance().getBoolean(ID + "/enabled", false);
+		return StatusManager.getInstance().getBoolean(ID + "/enabled", false) && !HideAllRendersModule.isActive();
 	}
 
 	public static boolean isHidePlayer() {
@@ -123,7 +123,7 @@ public class FreecamModule extends Module {
 
 	/** Called by EntityMixin from {@code Entity.turn}; keeps the freecam look separate from the player. */
 	public static void updateRotation(double yawDelta, double pitchDelta) {
-		if (!available) {
+		if (!available || HideAllRendersModule.isActive()) {
 			return;
 		}
 		lastYaw = rotYaw;
@@ -135,7 +135,7 @@ public class FreecamModule extends Module {
 
 	/** Interpolated camera position for the current render frame, or null when freecam is off. */
 	public static Vec3 getInterpolatedPosition(float partialTicks) {
-		if (!available) {
+		if (!available || HideAllRendersModule.isActive()) {
 			return null;
 		}
 		return lastPos.lerp(pos, partialTicks);
@@ -148,7 +148,7 @@ public class FreecamModule extends Module {
 	 * live target is returned directly instead.
 	 */
 	public static float[] getInterpolatedRotation(float partialTicks) {
-		if (!available) {
+		if (!available || HideAllRendersModule.isActive()) {
 			return null;
 		}
 		if (System.currentTimeMillis() - lastRotationTime > 50L) {

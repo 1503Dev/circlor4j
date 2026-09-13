@@ -45,6 +45,7 @@ public class KillAuraModule extends Module {
 	private static final String FILTER_PASSIVE = "filter_passive";
 	private static final String FILTER_NEUTRAL = "filter_neutral";
 	private static final String FILTER_HOSTILE = "filter_hostile";
+	private static final String ALLOW_BOTS = "allow_bots";
 	private static final int MODE_AUTO_INTERVAL = 0;
 	private static final int MODE_FIXED_CPS = 1;
 
@@ -69,6 +70,7 @@ public class KillAuraModule extends Module {
 		this.registerToggleIn(MOBS, FILTER_PASSIVE, "FilterPassive");
 		this.registerToggleIn(MOBS, FILTER_NEUTRAL, "FilterNeutral");
 		this.registerToggleIn(MOBS, FILTER_HOSTILE, "FilterHostile");
+		this.registerToggle(ALLOW_BOTS, "AllowBots");
 	}
 
 	@Override
@@ -139,6 +141,9 @@ public class KillAuraModule extends Module {
 			}
 			if (entity instanceof Player) {
 				if (!playersEnabled || entity.isSpectator()) {
+					continue;
+				}
+				if (!status.getBoolean(ID + "/" + ALLOW_BOTS + "/enabled", false) && AntiBotModule.isBot(entity)) {
 					continue;
 				}
 			} else {

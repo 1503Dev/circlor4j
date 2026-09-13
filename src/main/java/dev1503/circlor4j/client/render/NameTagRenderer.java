@@ -1,5 +1,6 @@
 package dev1503.circlor4j.client.render;
 
+import dev1503.circlor4j.client.module.modules.AntiBotModule;
 import dev1503.circlor4j.client.module.modules.NameTagModule;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -41,9 +42,12 @@ public final class NameTagRenderer {
 			if (!(entity instanceof Player player)) {
 				continue;
 			}
-			if (player == mc.player) {
-				continue;
-			}
+if (player == mc.player) {
+			continue;
+		}
+		if (!NameTagModule.isAllowBotsEnabled() && AntiBotModule.isBot(player)) {
+			continue;
+		}
 			Vec3 worldPos = entity.position().add(0.0, entity.getBbHeight() + 0.5, 0.0);
 			Vec3 screen = worldToScreen(worldPos, screenWidth, screenHeight);
 			if (screen == null) {

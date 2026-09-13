@@ -1,5 +1,6 @@
 package dev1503.circlor4j.client.render;
 
+import dev1503.circlor4j.client.module.modules.AntiBotModule;
 import dev1503.circlor4j.client.module.modules.TracerModule;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -58,6 +59,9 @@ public final class TracerRenderer {
 			int color;
 			if (entity instanceof Player) {
 				if (!TracerModule.isPlayersEnabled() || entity == mc.player) {
+					continue;
+				}
+				if (!TracerModule.isAllowBotsEnabled() && AntiBotModule.isBot(entity)) {
 					continue;
 				}
 				color = TracerModule.getPlayersColor();

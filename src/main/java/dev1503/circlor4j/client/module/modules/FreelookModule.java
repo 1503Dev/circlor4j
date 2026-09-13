@@ -48,12 +48,12 @@ public class FreelookModule extends Module {
 	}
 
 	public static boolean isActive() {
-		return StatusManager.getInstance().getBoolean(ID + "/enabled", false);
+		return StatusManager.getInstance().getBoolean(ID + "/enabled", false) && !HideAllRendersModule.isActive();
 	}
 
 	/** Called by EntityMixin from {@code Entity.turn}; updates the camera look while the player stays still. */
 	public static void updateRotation(double yawDelta, double pitchDelta) {
-		if (!available) {
+		if (!available || HideAllRendersModule.isActive()) {
 			return;
 		}
 		rotYaw += (float) yawDelta;
@@ -61,7 +61,7 @@ public class FreelookModule extends Module {
 	}
 
 	public static float[] getRotation() {
-		if (!available) {
+		if (!available || HideAllRendersModule.isActive()) {
 			return null;
 		}
 		return new float[] { rotYaw, rotPitch };

@@ -1,5 +1,6 @@
 package dev1503.circlor4j.client.module;
 
+import dev1503.circlor4j.client.module.modules.HideAllRendersModule;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,8 +60,9 @@ public final class ModuleManager {
 	}
 
 	public static void tick() {
+		boolean hideRenders = HideAllRendersModule.isActive();
 		for (Module module : MODULES) {
-			if (module.isEnabled()) {
+			if (module.isEnabled() && !(hideRenders && module.getCategory() == ModuleCategory.RENDER)) {
 				module.onTick();
 			}
 		}
