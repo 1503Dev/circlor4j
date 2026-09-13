@@ -61,8 +61,9 @@ public abstract class Module {
 	/**
 	 * An on/off option exposed to the UI as a nested Toggle, bound to path "{id}/{option}/enabled".
 	 * {@code parentOption} names the sub-toggle it should be nested under, if any.
+	 * {@code showCondition} optionally gates visibility.
 	 */
-	public record ToggleSetting(String path, String labelKey, String labelFallback, String parentOption) implements Setting {
+	public record ToggleSetting(String path, String labelKey, String labelFallback, String parentOption, String showCondition) implements Setting {
 	}
 
 	/**
@@ -250,9 +251,13 @@ public abstract class Module {
 	}
 
 	protected void registerToggle(String option, String label, boolean defaultEnabled) {
+		this.registerToggle(option, label, defaultEnabled, null);
+	}
+
+	protected void registerToggle(String option, String label, boolean defaultEnabled, String showCondition) {
 		String path = this.id + "/" + option + "/enabled";
 		this.status.setValueOnly(path, defaultEnabled ? 1.0 : 0.0);
-		this.settings.add(new ToggleSetting(path, "module." + this.id + "." + option + ".name", label, null));
+		this.settings.add(new ToggleSetting(path, "module." + this.id + "." + option + ".name", label, null, showCondition));
 	}
 
 	/** Registers an on/off toggle on path "{id}/{parentOption}/{option}/enabled", nested under the matching sub-toggle. */
@@ -261,9 +266,13 @@ public abstract class Module {
 	}
 
 	protected void registerToggleIn(String parentOption, String option, String label, boolean defaultEnabled) {
+		this.registerToggleIn(parentOption, option, label, defaultEnabled, null);
+	}
+
+	protected void registerToggleIn(String parentOption, String option, String label, boolean defaultEnabled, String showCondition) {
 		String path = this.id + "/" + parentOption + "/" + option + "/enabled";
 		this.status.setValueOnly(path, defaultEnabled ? 1.0 : 0.0);
-		this.settings.add(new ToggleSetting(path, "module." + this.id + "." + option + ".name", label, parentOption));
+		this.settings.add(new ToggleSetting(path, "module." + this.id + "." + option + ".name", label, parentOption, showCondition));
 	}
 
 	/** Registers a range slider on paths "{id}/{option}/min" and "{id}/{option}/max". */

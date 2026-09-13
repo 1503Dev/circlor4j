@@ -10,6 +10,6 @@ public class NoHurtCamModule extends Module {
 	}
 
 	public static boolean isActive() {
-		return StatusManager.getInstance().getBoolean("no_hurt_cam/enabled", false);
+		return StatusManager.getInstance().getBoolean("no_hurt_cam/enabled", false) && !HideAllRendersModule.isActive();
 	}
 }

@@ -16,6 +16,7 @@ public class TracerModule extends Module {
 	private static final String ITEMS = "items";
 	private static final String THICKNESS = "thickness";
 	private static final String ANCHOR = "anchor";
+	private static final String ALLOW_BOTS = "allow_bots";
 	private static final int ANCHOR_TOP = 0;
 	private static final int ANCHOR_CENTER = 1;
 	private static final int ANCHOR_BOTTOM = 2;
@@ -38,6 +39,7 @@ public class TracerModule extends Module {
 		this.registerColor(PLAYERS, "Color", DEFAULT_COLOR);
 		this.registerToggle(ITEMS, "Items");
 		this.registerColor(ITEMS, "Color", DEFAULT_COLOR);
+		this.registerToggle(ALLOW_BOTS, "AllowBots");
 	}
 
 	@Override
@@ -46,7 +48,7 @@ public class TracerModule extends Module {
 	}
 
 	public static boolean isActive() {
-		return StatusManager.getInstance().getBoolean(ID + "/enabled", false);
+		return StatusManager.getInstance().getBoolean(ID + "/enabled", false) && !HideAllRendersModule.isActive();
 	}
 
 	public static boolean isMobsEnabled() {
@@ -59,6 +61,10 @@ public class TracerModule extends Module {
 
 	public static boolean isItemsEnabled() {
 		return isActive() && StatusManager.getInstance().getBoolean(ID + "/" + ITEMS + "/enabled", false);
+	}
+
+	public static boolean isAllowBotsEnabled() {
+		return isActive() && StatusManager.getInstance().getBoolean(ID + "/" + ALLOW_BOTS + "/enabled", false);
 	}
 
 	public static int getMobsColor() {

@@ -1,8 +1,11 @@
 package dev1503.circlor4j.client.mixin;
 
+import dev1503.circlor4j.client.module.modules.AntiBotModule;
 import dev1503.circlor4j.client.module.modules.AntiKnockbackModule;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,5 +23,15 @@ public abstract class ClientPacketListenerMixin {
 			&& packet.id() == Minecraft.getInstance().player.getId()) {
 			ci.cancel();
 		}
+	}
+
+	@Inject(method = "handlePlayerInfoUpdate", at = @At("HEAD"))
+	private void circlor4jAntiBotInfoUpdate(ClientboundPlayerInfoUpdatePacket packet, CallbackInfo ci) {
+		AntiBotModule.onPlayerInfoUpdate(packet);
+	}
+
+	@Inject(method = "handlePlayerInfoRemove", at = @At("HEAD"))
+	private void circlor4jAntiBotInfoRemove(ClientboundPlayerInfoRemovePacket packet, CallbackInfo ci) {
+		AntiBotModule.onPlayerInfoRemove(packet);
 	}
 }

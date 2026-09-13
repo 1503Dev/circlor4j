@@ -36,12 +36,12 @@ public class FullBrightModule extends Module {
 
 	public static boolean isNightVisionActive() {
 		StatusManager status = StatusManager.getInstance();
-		return status.getBoolean(ID + "/enabled", false) && (int) status.getDouble(ID + "/" + MODE, MODE_NIGHT_VISION) == MODE_NIGHT_VISION;
+		return status.getBoolean(ID + "/enabled", false) && (int) status.getDouble(ID + "/" + MODE, MODE_NIGHT_VISION) == MODE_NIGHT_VISION && !HideAllRendersModule.isActive();
 	}
 
 	public static boolean isGammaActive() {
 		StatusManager status = StatusManager.getInstance();
-		return status.getBoolean(ID + "/enabled", false) && (int) status.getDouble(ID + "/" + MODE, MODE_NIGHT_VISION) == MODE_GAMMA;
+		return status.getBoolean(ID + "/enabled", false) && (int) status.getDouble(ID + "/" + MODE, MODE_NIGHT_VISION) == MODE_GAMMA && !HideAllRendersModule.isActive();
 	}
 
 	public static double getGammaValue() {

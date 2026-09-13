@@ -69,7 +69,7 @@ public class ArraylistModule extends Module {
 	}
 
 	public static boolean isActive() {
-		return StatusManager.getInstance().getBoolean(ID + "/enabled", true);
+		return StatusManager.getInstance().getBoolean(ID + "/enabled", true) && !HideAllRendersModule.isActive();
 	}
 
 	public static int getMode() {

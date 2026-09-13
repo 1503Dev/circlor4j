@@ -39,6 +39,7 @@ public class CrystalAuraModule extends Module {
 	private static final String SELF_DAMAGE = "self_damage";
 	private static final String PLACE_DELAY = "place_delay";
 	private static final String BREAK_DELAY = "break_delay";
+	private static final String ALLOW_BOTS = "allow_bots";
 
 	private static final float EXPLOSION_POWER = 6.0F;
 
@@ -54,6 +55,7 @@ public class CrystalAuraModule extends Module {
 		this.registerSlider(SELF_DAMAGE, "Self Damage", 0.0, 20.0, 0.5, 4.0);
 		this.registerSlider(PLACE_DELAY, "Place Delay", 0.0, 20.0, 1.0, 2.0);
 		this.registerSlider(BREAK_DELAY, "Break Delay", 0.0, 20.0, 1.0, 2.0);
+		this.registerToggle(ALLOW_BOTS, "AllowBots");
 	}
 
 	@Override
@@ -93,6 +95,9 @@ public class CrystalAuraModule extends Module {
 		double bestDist = range * range;
 		for (Player other : player.level().players()) {
 			if (other == player || !other.isAlive() || other.isSpectator()) {
+				continue;
+			}
+			if (!this.getStatus().getBoolean(ID + "/" + ALLOW_BOTS + "/enabled", false) && AntiBotModule.isBot(other)) {
 				continue;
 			}
 			double dist = player.distanceToSqr(other);

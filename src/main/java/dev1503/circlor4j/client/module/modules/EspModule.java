@@ -19,6 +19,7 @@ import dev1503.circlor4j.ui.StatusManager;
 	private static final String PLAYERS = "players";
 	private static final String ITEMS = "items";
 	private static final String THICKNESS = "thickness";
+	private static final String ALLOW_BOTS = "allow_bots";
 
 	public static final int DEFAULT_COLOR = 0xFFFFFFFF;
 
@@ -31,6 +32,7 @@ import dev1503.circlor4j.ui.StatusManager;
 		this.registerColor(PLAYERS, "Color", DEFAULT_COLOR);
 		this.registerToggle(ITEMS, "Items");
 		this.registerColor(ITEMS, "Color", DEFAULT_COLOR);
+		this.registerToggle(ALLOW_BOTS, "AllowBots");
 	}
 
 	@Override
@@ -39,7 +41,7 @@ import dev1503.circlor4j.ui.StatusManager;
 	}
 
 	public static boolean isActive() {
-		return StatusManager.getInstance().getBoolean(ID + "/enabled", false);
+		return StatusManager.getInstance().getBoolean(ID + "/enabled", false) && !HideAllRendersModule.isActive();
 	}
 
 	public static boolean isMobsEnabled() {
@@ -52,6 +54,10 @@ import dev1503.circlor4j.ui.StatusManager;
 
 	public static boolean isItemsEnabled() {
 		return isActive() && StatusManager.getInstance().getBoolean(ID + "/" + ITEMS + "/enabled", false);
+	}
+
+	public static boolean isAllowBotsEnabled() {
+		return isActive() && StatusManager.getInstance().getBoolean(ID + "/" + ALLOW_BOTS + "/enabled", false);
 	}
 
 	public static int getMobsColor() {

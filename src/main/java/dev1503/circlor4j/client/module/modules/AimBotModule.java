@@ -22,6 +22,7 @@ public class AimBotModule extends Module {
 	private static final String MOBS = "mobs";
 	private static final String INVENTORY = "inventory";
 	private static final String RAYCAST = "raycast";
+	private static final String ALLOW_BOTS = "allow_bots";
 
 	private static AimBotModule instance;
 
@@ -38,6 +39,7 @@ public class AimBotModule extends Module {
 		this.registerToggle(MOBS, "Mobs");
 		this.registerToggle(INVENTORY, "Inventory");
 		this.registerToggle(RAYCAST, "Wall Check", true);
+		this.registerToggle(ALLOW_BOTS, "AllowBots");
 		AimBotModule.instance = this;
 	}
 
@@ -75,6 +77,10 @@ public class AimBotModule extends Module {
 
 	public static boolean isRaycastEnabled() {
 		return isActive() && StatusManager.getInstance().getBoolean(ID + "/" + RAYCAST + "/enabled", false);
+	}
+
+	public static boolean isAllowBotsEnabled() {
+		return isActive() && StatusManager.getInstance().getBoolean(ID + "/" + ALLOW_BOTS + "/enabled", false);
 	}
 
 	@Override
@@ -165,8 +171,13 @@ public class AimBotModule extends Module {
 			if (!living.isAlive()) {
 				continue;
 			}
-			if (entity instanceof Player && !isPlayersEnabled()) {
-				continue;
+			if (entity instanceof Player) {
+				if (!isPlayersEnabled()) {
+					continue;
+				}
+				if (!isAllowBotsEnabled() && AntiBotModule.isBot(entity)) {
+					continue;
+				}
 			}
 			if (!(entity instanceof Player) && !isMobsEnabled()) {
 				continue;

@@ -5,6 +5,8 @@
 	"client": [
 		"NoParticlesClientLevelMixin",
 		"NoParticlesParticleEngineMixin",
+		"PacketDecoderMixin",
+		"SafeWalkPlayerMixin",
 		"MinecraftClientMixin",
 		"KeyboardHandlerMixin",
 		"KeyMappingAccessor",
@@ -12,6 +14,7 @@
 		"LivingEntityRendererMixin",
 		"LocalPlayerMixin",
 		"CameraMixin",
+		"ConnectionMixin",
 		"ClientInputMixin",
 		"EagleKeyboardInputMixin",
 		"EntityMixin",
