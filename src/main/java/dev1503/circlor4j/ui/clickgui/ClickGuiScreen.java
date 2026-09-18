@@ -1,5 +1,6 @@
 package dev1503.circlor4j.ui.clickgui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev1503.circlor4j.ModStatic;
 import dev1503.circlor4j.client.config.ModStorage;
 import dev1503.circlor4j.client.module.ModuleCategory;
@@ -303,7 +304,7 @@ public class ClickGuiScreen extends Screen {
 		if (this.updateButton != null && UpdateChecker.hasUpdate() && this.updateButton.mouseClicked(event)) {
 			return true;
 		}
-		if (event.button() == 0 && my >= TAB_TOP && my < TAB_TOP + TAB_HEIGHT) {
+		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && my >= TAB_TOP && my < TAB_TOP + TAB_HEIGHT) {
 			int[] r = this.tabRects();
 			if (mx >= r[0] && mx < r[0] + r[2]) {
 				this.setTab(0);

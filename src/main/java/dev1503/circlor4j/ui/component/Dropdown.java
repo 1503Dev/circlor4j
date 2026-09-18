@@ -1,5 +1,6 @@
 package dev1503.circlor4j.ui.component;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev1503.circlor4j.ui.StatusManager;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -104,7 +105,7 @@ public class Dropdown extends Component {
 
 	/** Row click (called by the owning CategoryWindow): toggles the menu. */
 	public boolean mouseClickedRow(MouseButtonEvent event) {
-		if (event.button() != 0 || !this.containsRow((int) event.x(), (int) event.y())) {
+		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT || !this.containsRow((int) event.x(), (int) event.y())) {
 			return false;
 		}
 		this.menuOpen = !this.menuOpen;
@@ -113,7 +114,7 @@ public class Dropdown extends Component {
 
 	/** Menu item click (called by the ClickGuiScreen, top layer). */
 	public boolean mouseClickedMenu(MouseButtonEvent event, Font font) {
-		if (!this.menuOpen || event.button() != 0) {
+		if (!this.menuOpen || event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
 			return false;
 		}
 		int mx = (int) event.x();

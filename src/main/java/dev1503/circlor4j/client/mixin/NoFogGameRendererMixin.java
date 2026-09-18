@@ -19,7 +19,7 @@ public abstract class NoFogGameRendererMixin {
 		method = "renderLevel",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/client/renderer/fog/FogRenderer;getBuffer(Lnet/minecraft/client/renderer/fog/FogRenderer$FogMode;)Lcom/mojang/blaze3d/buffers/GpuBufferSlice;",
+			target = "Lnet/minecraft/client/renderer/fog/FogRenderer;getBuffer(Lnet/minecraft/client/renderer/fog/FogRenderer$FogMode;)Lcom/mojang/renderpearl/api/buffers/GpuBufferSlice;",
 			ordinal = 0
 		),
 		index = 0

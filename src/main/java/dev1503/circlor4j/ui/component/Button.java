@@ -1,5 +1,6 @@
 package dev1503.circlor4j.ui.component;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -71,7 +72,7 @@ public abstract class Button {
 
 	/** Left-click within bounds: fires the button. */
 	public boolean mouseClicked(MouseButtonEvent event) {
-		if (event.button() != 0 || !this.contains((int) event.x(), (int) event.y())) {
+		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT || !this.contains((int) event.x(), (int) event.y())) {
 			return false;
 		}
 		this.onPress();

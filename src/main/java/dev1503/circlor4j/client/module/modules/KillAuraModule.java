@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.NeutralMob;
@@ -108,7 +109,7 @@ public class KillAuraModule extends Module {
 		} else {
 			minecraft.gameMode.attack(player, targets.get(0));
 		}
-		player.swing(InteractionHand.MAIN_HAND);
+		player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
 	}
 
 	/** All eligible living entities within reach, nearest first. */

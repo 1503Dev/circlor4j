@@ -22,7 +22,7 @@ public abstract class LivingEntityRendererMixin<S extends LivingEntityRenderStat
 	private void circlor4jTrueSight(S state, boolean isBodyVisible, boolean forceTransparent, boolean appearGlowing, CallbackInfoReturnable<RenderType> cir) {
 		if (TrueSightModule.isEntitiesEnabled() && state.isInvisible && !isBodyVisible && !forceTransparent && !appearGlowing) {
 			state.isInvisible = false;
-			cir.setReturnValue(RenderTypes.entityTranslucentCullItemTarget(this.getTextureLocation(state)));
+			cir.setReturnValue(RenderTypes.entityTranslucentCull(this.getTextureLocation(state)));
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package dev1503.circlor4j.ui.component;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -68,7 +69,7 @@ public class ContextMenu {
 	}
 
 	public boolean mouseClicked(MouseButtonEvent event) {
-		if (!this.isOpen() || event.button() != 0) {
+		if (!this.isOpen() || event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
 			return false;
 		}
 		int mx = (int) event.x();

@@ -1,5 +1,6 @@
 package dev1503.circlor4j.ui.component;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev1503.circlor4j.ui.StatusManager;
 import java.math.BigDecimal;
 import java.util.Locale;
@@ -108,7 +109,7 @@ public class Slider extends Component {
 	}
 
 	public boolean mouseClicked(MouseButtonEvent event) {
-		if (event.button() != 0) {
+		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
 			return false;
 		}
 		int mx = (int) event.x();

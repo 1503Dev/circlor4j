@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import org.lwjgl.glfw.GLFW;
 
 /** Holds the registered keybinds, dispatches key input by mode, and persists them as JSON. */
 public final class KeyBindManager {
@@ -20,22 +19,27 @@ public final class KeyBindManager {
 	private KeyBindManager() {
 	}
 
-	/** Seeds the default ClickGUI bind when nothing is registered yet. */
+	/** Seeds the default ClickGUI binds when nothing is registered yet. */
 	public static void init() {
 		if (BINDS.isEmpty()) {
-			BINDS.add(defaultClickGuiBind());
+			BINDS.addAll(defaultClickGuiBinds());
 		}
 	}
 
-	private static KeyBind defaultClickGuiBind() {
-		return new KeyBind(
-			InputConstants.Type.KEYSYM.getOrCreate(InputConstants.KEY_RSHIFT),
-			false,
-			false,
-			false,
-			"clickgui",
-			KeyBind.Mode.TOGGLE
-		);
+	private static KeyBind clickGuiBind(InputConstants.Key key) {
+		return new KeyBind(key, false, false, false, "clickgui", KeyBind.Mode.TOGGLE);
+	}
+
+	private static KeyBind defaultClickGuiShiftBind() {
+		return clickGuiBind(InputConstants.Type.KEYBOARD.getOrCreate(InputConstants.KEY_RSHIFT));
+	}
+
+	private static KeyBind defaultClickGuiYBind() {
+		return clickGuiBind(InputConstants.Type.KEYBOARD.getOrCreate(InputConstants.KEY_Y));
+	}
+
+	private static List<KeyBind> defaultClickGuiBinds() {
+		return List.of(defaultClickGuiShiftBind(), defaultClickGuiYBind());
 	}
 
 	public static List<KeyBind> all() {
@@ -88,7 +92,7 @@ public final class KeyBindManager {
 			if (inGui && !isClickGuiBind(bind)) {
 				continue;
 			}
-			if (action == GLFW.GLFW_RELEASE) {
+			if (action == InputConstants.RELEASE) {
 				if (bind.matchesKey(key) && bind.isDown()) {
 					if (bind.getMode() == KeyBind.Mode.HOLD) {
 						setFunctionEnabled(bind.getFunction(), false);
@@ -96,7 +100,7 @@ public final class KeyBindManager {
 					bind.setDown(false);
 					consumed = true;
 				}
-			} else if (action == GLFW.GLFW_PRESS) {
+			} else if (action == InputConstants.PRESS) {
 				if (!bind.matches(key, shift, ctrl, alt) || bind.isDown()) {
 					continue;
 				}
@@ -171,7 +175,7 @@ public final class KeyBindManager {
 			replaceBinds(ModStorage.readKeybinds(file));
 		}
 		if (BINDS.isEmpty()) {
-			BINDS.add(defaultClickGuiBind());
+			BINDS.addAll(defaultClickGuiBinds());
 		}
 		ensureClickGuiBind();
 	}
@@ -182,33 +186,38 @@ public final class KeyBindManager {
 		}
 		replaceBinds(ModStorage.readKeybinds(file));
 		if (BINDS.isEmpty()) {
-			BINDS.add(defaultClickGuiBind());
+			BINDS.addAll(defaultClickGuiBinds());
 		}
 		ensureClickGuiBind();
 	}
 
 	/**
-	 * Ensures a valid bind opens the ClickGUI; if it is missing or invalid, binds it to Right
-	 * Shift. Always writes the result back to default.json so the config stays valid.
+	 * Ensures valid binds open the ClickGUI; if it is missing or invalid, binds it to Right
+	 * Shift and Y. If a valid binds exists but no Y bind yet (e.g. configs saved before Y was
+	 * added), the Y bind is appended so both keys coexist. Always writes the result back to
+	 * default.json so the config stays valid.
 	 */
 	private static void ensureClickGuiBind() {
 		boolean hasValid = false;
+		boolean hasY = false;
+		InputConstants.Key yKey = InputConstants.Type.KEYBOARD.getOrCreate(InputConstants.KEY_Y);
 		for (KeyBind bind : BINDS) {
-			Module module = resolveFunction(bind.getFunction());
-			if (module != null
-				&& ClickGuiModule.ID.equals(module.getId())
-				&& bind.getKey() != null
-				&& bind.getKey() != InputConstants.UNKNOWN) {
-				hasValid = true;
-				break;
+			if (!isClickGuiBind(bind)) {
+				continue;
+			}
+			if (bind.getKey() == null || bind.getKey() == InputConstants.UNKNOWN) {
+				continue;
+			}
+			hasValid = true;
+			if (bind.getKey().equals(yKey)) {
+				hasY = true;
 			}
 		}
 		if (!hasValid) {
-			BINDS.removeIf(bind -> {
-				Module module = resolveFunction(bind.getFunction());
-				return module != null && ClickGuiModule.ID.equals(module.getId());
-			});
-			BINDS.add(defaultClickGuiBind());
+			BINDS.removeIf(KeyBindManager::isClickGuiBind);
+			BINDS.addAll(defaultClickGuiBinds());
+		} else if (!hasY) {
+			BINDS.add(defaultClickGuiYBind());
 		}
 		saveDefault();
 	}
