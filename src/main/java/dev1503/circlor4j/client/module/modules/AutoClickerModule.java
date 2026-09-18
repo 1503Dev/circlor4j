@@ -7,9 +7,9 @@ import java.util.Random;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import org.lwjgl.glfw.GLFW;
 
 /**
  * Automatically clicks the mouse. The click rate randomly fluctuates within the CPS range.
@@ -46,14 +46,14 @@ public class AutoClickerModule extends Module {
 		double cpsMin = Math.min(this.getCpsMin(), this.getCpsMax());
 		double cpsMax = Math.max(this.getCpsMin(), this.getCpsMax());
 
-		if (this.isClickerActive(LEFT) && (!this.isHoldOn(LEFT) || isMouseDown(0))) {
+		if (this.isClickerActive(LEFT) && (!this.isHoldOn(LEFT) || isMouseDown(mc, 0))) {
 			this.leftTicks--;
 			if (this.leftTicks <= 0) {
 				this.leftClick(mc, player);
 				this.leftTicks = this.nextTicks(cpsMin, cpsMax);
 			}
 		}
-		if (this.isClickerActive(RIGHT) && (!this.isHoldOn(RIGHT) || isMouseDown(1))) {
+		if (this.isClickerActive(RIGHT) && (!this.isHoldOn(RIGHT) || isMouseDown(mc, 1))) {
 			this.rightTicks--;
 			if (this.rightTicks <= 0) {
 				this.rightClick(mc, player);
@@ -83,9 +83,8 @@ public class AutoClickerModule extends Module {
 		return Math.max(1, (int) Math.round(20.0 / cps));
 	}
 
-	private static boolean isMouseDown(int button) {
-		long handle = Minecraft.getInstance().getWindow().handle();
-		return GLFW.glfwGetMouseButton(handle, button) == GLFW.GLFW_PRESS;
+	private static boolean isMouseDown(Minecraft mc, int button) {
+		return button == 0 ? mc.mouseHandler.isLeftPressed() : mc.mouseHandler.isRightPressed();
 	}
 
 	private void leftClick(Minecraft mc, LocalPlayer player) {
@@ -100,7 +99,7 @@ public class AutoClickerModule extends Module {
 				}
 			}
 		}
-		player.swing(InteractionHand.MAIN_HAND);
+		player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
 	}
 
 	private void rightClick(Minecraft mc, LocalPlayer player) {
@@ -126,6 +125,6 @@ public class AutoClickerModule extends Module {
 		if (!usedTarget) {
 			mc.gameMode.useItem(player, hand);
 		}
-		player.swing(hand);
+		player.swing(hand, SwingAnimation.DEFAULT, false);
 	}
 }

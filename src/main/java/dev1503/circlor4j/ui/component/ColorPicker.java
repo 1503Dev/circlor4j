@@ -1,5 +1,6 @@
 package dev1503.circlor4j.ui.component;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev1503.circlor4j.i18n.I18n;
 import dev1503.circlor4j.ui.StatusManager;
 import net.minecraft.client.Minecraft;
@@ -162,7 +163,7 @@ public class ColorPicker extends Component {
 
 	/** Row click (called by the owning CategoryWindow): toggles the popup window. */
 	public boolean mouseClickedRow(MouseButtonEvent event) {
-		if (event.button() != 0 || !this.containsRow((int) event.x(), (int) event.y())) {
+		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT || !this.containsRow((int) event.x(), (int) event.y())) {
 			return false;
 		}
 		this.windowOpen = !this.windowOpen;
@@ -175,7 +176,7 @@ public class ColorPicker extends Component {
 
 	/** Window click (called by the ClickGuiScreen, top layer). */
 	public boolean mouseClickedWindow(MouseButtonEvent event, Font font) {
-		if (!this.windowOpen || event.button() != 0) {
+		if (!this.windowOpen || event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
 			return false;
 		}
 		int mx = (int) event.x();

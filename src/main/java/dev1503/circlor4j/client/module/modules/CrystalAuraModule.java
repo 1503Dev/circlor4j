@@ -10,6 +10,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.entity.player.Inventory;
@@ -126,7 +127,7 @@ public class CrystalAuraModule extends Module {
 			return false;
 		}
 		mc.gameMode.attack(player, best);
-		player.swing(InteractionHand.MAIN_HAND);
+		player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
 		return true;
 	}
 
@@ -146,7 +147,7 @@ public class CrystalAuraModule extends Module {
 		Vec3 hitVec = new Vec3(base.getX() + 0.5, base.getY() + 1.0, base.getZ() + 0.5);
 		BlockHitResult blockHit = new BlockHitResult(hitVec, Direction.UP, base, false);
 		mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, blockHit);
-		player.swing(InteractionHand.MAIN_HAND);
+		player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
 		return true;
 	}
 

@@ -49,8 +49,8 @@ public abstract class NoParticlesClientLevelMixin {
 		}
 	}
 
-	@Inject(method = "addBreakingBlockEffect", at = @At("HEAD"), cancellable = true)
-	private void cancelBreakingBlockEffect(BlockPos pos, Direction direction, CallbackInfo ci) {
+	@Inject(method = "addBreakingBlockEffects", at = @At("HEAD"), cancellable = true)
+	private void cancelBreakingBlockEffect(BlockPos pos, Direction direction, boolean isPrecise, CallbackInfo ci) {
 		if (NoParticlesModule.isActive()) {
 			ci.cancel();
 		}

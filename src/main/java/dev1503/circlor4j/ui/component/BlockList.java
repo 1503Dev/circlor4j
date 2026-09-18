@@ -1,5 +1,6 @@
 package dev1503.circlor4j.ui.component;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev1503.circlor4j.i18n.I18n;
 import dev1503.circlor4j.ui.StatusManager;
 import net.minecraft.ChatFormatting;
@@ -202,7 +203,7 @@ public class BlockList extends Component {
 
 	/** Row click (called by the owning CategoryWindow): toggles the popup window. */
 	public boolean mouseClickedRow(MouseButtonEvent event) {
-		if (event.button() != 0 || !this.containsRow((int) event.x(), (int) event.y())) {
+		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT || !this.containsRow((int) event.x(), (int) event.y())) {
 			return false;
 		}
 		this.windowOpen = !this.windowOpen;
@@ -241,12 +242,12 @@ public class BlockList extends Component {
 		}
 		int index = this.itemAt(mx, my);
 		if (index >= 0 && index < this.members.size()) {
-			if (event.button() == 0) {
+			if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 				String id = this.members.get(index);
 				boolean enabled = this.status.getBoolean(this.blockPath(id), false);
 				this.status.setValue(this, this.blockPath(id), enabled ? 0.0 : 1.0);
 				this.rebuildMembers();
-			} else if (event.button() == 1) {
+			} else if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
 				this.openContextMenu(index, (int) event.x(), (int) event.y());
 			}
 			return true;

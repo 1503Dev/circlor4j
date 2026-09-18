@@ -1,5 +1,6 @@
 package dev1503.circlor4j.ui.component;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev1503.circlor4j.client.module.modules.XrayModule;
 import dev1503.circlor4j.i18n.I18n;
 import dev1503.circlor4j.ui.StatusManager;
@@ -170,7 +171,7 @@ public class ColorList extends Component {
 	}
 
 	public boolean mouseClickedRow(MouseButtonEvent event) {
-		if (event.button() != 0 || !this.containsRow((int) event.x(), (int) event.y())) {
+		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT || !this.containsRow((int) event.x(), (int) event.y())) {
 			return false;
 		}
 		this.windowOpen = !this.windowOpen;
@@ -204,7 +205,7 @@ public class ColorList extends Component {
 			}
 			this.activePicker.closeWindow();
 			this.activePicker = null;
-			if (event.button() == 0) {
+			if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 				int index = this.itemAt(mx, my);
 				if (index >= 0 && index < this.members.size()) {
 					this.openPicker(index, mx, my);
@@ -215,9 +216,9 @@ public class ColorList extends Component {
 		}
 		int index = this.itemAt(mx, my);
 		if (index >= 0 && index < this.members.size()) {
-			if (event.button() == 0) {
+			if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 				this.openPicker(index, mx, my);
-			} else if (event.button() == 1) {
+			} else if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
 				this.openContextMenu(index, mx, my);
 			}
 			return true;
@@ -245,7 +246,7 @@ public class ColorList extends Component {
 		ColorPicker picker = new ColorPicker(this.status, this.colorPath(id), name, XrayModule.defaultColorFor(id), mx, my, this.width, CategoryWindow.ROW_HEIGHT);
 		picker.setPosition(mx, my);
 		this.activePicker = picker;
-		MouseButtonEvent event = new MouseButtonEvent(mx, my, new MouseButtonInfo(0, 0));
+		MouseButtonEvent event = new MouseButtonEvent(mx, my, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0));
 		this.activePicker.mouseClickedRow(event);
 	}
 

@@ -1,16 +1,15 @@
 package dev1503.circlor4j.client.render;
 
-import com.mojang.blaze3d.PrimitiveTopology;
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.DepthStencilState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.renderpearl.api.pipeline.BlendFunction;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.CompareOp;
+import com.mojang.renderpearl.api.pipeline.DepthStencilState;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import dev1503.circlor4j.client.mixin.RenderTypeAccessor;
 import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.rendertype.LayeringTransform;
-import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 
@@ -30,7 +29,8 @@ public final class EspRenderType {
 			.withBindGroupLayout(BindGroupLayouts.GLOBALS)
 			.buildSnippet();
 		RenderPipeline.Snippet matricesFog = RenderPipeline.builder(globals)
-			.withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION)
+			.withBindGroupLayout(BindGroupLayouts.PROJECTION)
+			.withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
 			.withBindGroupLayout(BindGroupLayouts.FOG)
 			.buildSnippet();
 		RenderPipeline pipeline = RenderPipeline.builder(matricesFog)
@@ -45,7 +45,6 @@ public final class EspRenderType {
 			.build();
 		RenderSetup setup = RenderSetup.builder(pipeline)
 			.setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
-			.setOutputTarget(OutputTarget.MAIN_TARGET)
 			.createRenderSetup();
 		return RenderTypeAccessor.circlor4jCreate("circlor4j_esp_lines", setup);
 	}

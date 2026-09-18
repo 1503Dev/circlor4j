@@ -1,5 +1,6 @@
 package dev1503.circlor4j.ui.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev1503.circlor4j.client.keybind.KeyBindManager;
 import dev1503.circlor4j.i18n.I18n;
 import dev1503.circlor4j.ui.component.Button;
@@ -110,7 +111,7 @@ public class FilePickerScreen extends Screen {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (event.button() != 0) {
+		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
 			return super.mouseClicked(event, doubleClick);
 		}
 		int mx = (int) event.x();

@@ -4,6 +4,7 @@ import dev1503.circlor4j.client.module.modules.JetpackModule;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -13,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class JetpackTravelMixin {
 
 	@Inject(method = "travel", at = @At("RETURN"))
-	private void onTravelReturn(CallbackInfo ci) {
+	private void onTravelReturn(Vec3 movementInput, CallbackInfo ci) {
 		LivingEntity self = (LivingEntity) (Object) this;
 		if (!(self instanceof LocalPlayer) || Minecraft.getInstance().player != self) {
 			return;

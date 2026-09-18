@@ -13,6 +13,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -192,7 +193,7 @@ public class ScaffoldModule extends Module {
 						if (getPlaceSide(bp) == null) continue;
 						if (!canPlace(bp)) continue;
 						if (mc.player.getEyePosition().distanceToSqr(Vec3.atCenterOf(bp.relative(getClosestPlaceSide(bp)))) > 36) continue;
-						blockPosArray.add(new BlockPos(bp));
+						blockPosArray.add(bp.immutable());
 					}
 				}
 			}
@@ -319,7 +320,7 @@ public class ScaffoldModule extends Module {
 		}
 		mc.gameMode.useItemOn(mc.player, InteractionHand.MAIN_HAND, hitResult);
 		if (isSwingEnabled()) {
-			mc.player.swing(InteractionHand.MAIN_HAND);
+			mc.player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
 		}
 		if (switched) {
 			mc.player.getInventory().setSelectedSlot(prevSlot);

@@ -1,5 +1,6 @@
 package dev1503.circlor4j.ui.component;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.cursor.CursorType;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import dev1503.circlor4j.client.module.Module;
@@ -13,7 +14,6 @@ import java.util.List;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
-import org.lwjgl.glfw.GLFW;
 
 /**
  * A window holding one category's module toggles; each toggle may carry sub-rows
@@ -45,7 +45,7 @@ public class CategoryWindow {
 	private static final int HEADER_TEXT_COLOR = 0xFFFFFFFF;
 
 	private static final CursorType RESIZE_NWSE = CursorType.createStandardCursor(
-		GLFW.GLFW_RESIZE_NWSE_CURSOR, "resize_nwse", CursorTypes.RESIZE_ALL
+		5, "resize_nwse", CursorTypes.RESIZE_ALL
 	);
 
 	private enum ResizeMode { NONE, RIGHT, BOTTOM, BOTTOM_RIGHT }
@@ -755,7 +755,7 @@ public class CategoryWindow {
 	}
 
 	public boolean mouseClicked(MouseButtonEvent event) {
-		if (event.button() != 0 && event.button() != 1) {
+		if (event.button() != InputConstants.MOUSE_BUTTON_LEFT && event.button() != InputConstants.MOUSE_BUTTON_RIGHT) {
 			return false;
 		}
 		int mx = (int) event.x();

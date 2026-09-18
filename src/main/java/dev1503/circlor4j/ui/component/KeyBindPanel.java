@@ -1,5 +1,6 @@
 package dev1503.circlor4j.ui.component;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev1503.circlor4j.client.keybind.KeyBind;
 import dev1503.circlor4j.client.keybind.KeyBindManager;
 import dev1503.circlor4j.i18n.I18n;
@@ -131,7 +132,7 @@ public class KeyBindPanel {
 		if (this.contextBind != null) {
 			int menuX = this.contextMenuX(width);
 			int menuY = this.contextMenuY(height);
-			if (event.button() == 0) {
+			if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 				if (mx >= menuX && mx < menuX + MENU_W) {
 					if (my >= menuY && my < menuY + MENU_ROW_H) {
 						Minecraft.getInstance().gui.setScreen(new AddKeyBindDialog(this.host, this.contextBind));
@@ -150,7 +151,7 @@ public class KeyBindPanel {
 			}
 			this.contextBind = null;
 		}
-		if (event.button() == 0) {
+		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 			this.layoutButtons(width, height);
 			if (this.addButton.mouseClicked(event)) {
 				return true;
@@ -164,7 +165,7 @@ public class KeyBindPanel {
 			if (this.saveAsButton.mouseClicked(event)) {
 				return true;
 			}
-		} else if (event.button() == 1) {
+		} else if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
 			if (mx >= this.contentLeft(width) + SIDE && mx < this.contentRight(width) - SIDE) {
 				List<KeyBind> binds = KeyBindManager.all();
 				int index = this.scroll + this.rowAt(my, listTop);

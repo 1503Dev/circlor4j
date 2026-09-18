@@ -1,5 +1,6 @@
 package dev1503.circlor4j.ui.component;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev1503.circlor4j.ui.StatusManager;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -105,13 +106,13 @@ public class Toggle extends Component {
 		if (mx < this.x || mx >= this.x + this.width || my < this.y || my >= this.y + this.height) {
 			return false;
 		}
-		if (event.button() == 1) {
+		if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
 			if (this.hasChildren()) {
 				this.expanded = !this.expanded;
 			}
 			return true;
 		}
-		if (event.button() == 0) {
+		if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
 			this.checked = !this.checked;
 			this.status.setValue(this, this.getPath(), this.checked ? 1.0 : 0.0);
 			return true;

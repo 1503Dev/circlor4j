@@ -43,21 +43,21 @@ public abstract class KeyboardInputMixin extends ClientInputMixin {
 		InputConstants.Key shift = ((KeyMappingAccessor) (Object) mc.options.keyShift).circlor4jKey();
 		InputConstants.Key sprint = ((KeyMappingAccessor) (Object) mc.options.keySprint).circlor4jKey();
 		this.keyPresses = new Input(
-			isKeyDown(mc, up),
-			isKeyDown(mc, down),
-			isKeyDown(mc, left),
-			isKeyDown(mc, right),
-			isKeyDown(mc, jump),
-			isKeyDown(mc, shift),
-			isKeyDown(mc, sprint)
+			isKeyDown(up),
+			isKeyDown(down),
+			isKeyDown(left),
+			isKeyDown(right),
+			isKeyDown(jump),
+			isKeyDown(shift),
+			isKeyDown(sprint)
 		);
 		float forwardImpulse = impulse(this.keyPresses.forward(), this.keyPresses.backward());
 		float leftImpulse = impulse(this.keyPresses.left(), this.keyPresses.right());
 		this.moveVector = new Vec2(leftImpulse, forwardImpulse).normalized();
 	}
 
-	private static boolean isKeyDown(Minecraft mc, InputConstants.Key key) {
-		return InputConstants.isKeyDown(mc.getWindow(), key.getValue());
+	private static boolean isKeyDown(InputConstants.Key key) {
+		return InputConstants.isKeyDown(key.getValue());
 	}
 
 	private static float impulse(boolean positive, boolean negative) {
