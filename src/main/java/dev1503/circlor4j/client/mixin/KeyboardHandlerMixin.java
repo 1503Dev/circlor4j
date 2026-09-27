@@ -2,7 +2,9 @@ package dev1503.circlor4j.client.mixin;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dev1503.circlor4j.client.keybind.KeyBindManager;
+import dev1503.circlor4j.ui.clickgui.ClickGuiScreen;
 import dev1503.circlor4j.ui.screen.AddKeyBindDialog;
+import dev1503.circlor4j.ui.screen.FilePickerScreen;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.KeyEvent;
@@ -22,9 +24,16 @@ public abstract class KeyboardHandlerMixin {
 		}
 
 		InputConstants.Key key = InputConstants.getKey(event);
-		if (!AddKeyBindDialog.isCapturing()
+		if (!isTextInputFocused()
 			&& KeyBindManager.onKeyInput(key, event.hasShiftDown(), event.hasControlDown(), event.hasAltDown(), action)) {
 			ci.cancel();
 		}
+	}
+
+	/** Whether one of the hand-drawn text fields currently owns raw key input. */
+	private static boolean isTextInputFocused() {
+		return AddKeyBindDialog.isInputFocused()
+			|| FilePickerScreen.isInputFocused()
+			|| ClickGuiScreen.isBlockListInputFocused();
 	}
 }
