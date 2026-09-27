@@ -124,13 +124,31 @@ public class BlockList extends Component {
 
 	public void closeWindow() {
 		this.windowOpen = false;
-		this.inputActive = false;
+		this.setInputActive(false);
 		this.inputBuffer = "";
 		this.contextMenu.close();
 	}
 
 	public boolean isInputActive() {
 		return this.inputActive;
+	}
+
+	/**
+	 * Toggles the add-id field. Minecraft only feeds {@link net.minecraft.client.gui.screens.Screen#charTyped}
+	 * when SDL text input is running, and vanilla starts it from {@code EditBox#setFocused}; this is a
+	 * hand-drawn field outside of any vanilla widget, so it has to start/stop text input itself.
+	 */
+	private void setInputActive(boolean active) {
+		if (this.inputActive == active) {
+			return;
+		}
+		this.inputActive = active;
+		var textInput = Minecraft.getInstance().textInputManager();
+		if (active) {
+			textInput.startTextInput(this);
+		} else {
+			textInput.stopTextInput(this);
+		}
 	}
 
 	public boolean isContextMenuOpen() {
@@ -208,7 +226,7 @@ public class BlockList extends Component {
 		}
 		this.windowOpen = !this.windowOpen;
 		if (this.windowOpen) {
-			this.inputActive = false;
+			this.setInputActive(false);
 			this.inputBuffer = "";
 			this.clampScroll();
 		}
@@ -226,13 +244,13 @@ public class BlockList extends Component {
 			return false;
 		}
 		if (this.inHeaderField(mx, my)) {
-			this.inputActive = true;
+			this.setInputActive(true);
 			return true;
 		}
 		if (this.addButton.mouseClicked(event)) {
 			return true;
 		}
-		this.inputActive = false;
+		this.setInputActive(false);
 		boolean menuWasOpen = this.contextMenu.isOpen();
 		if (this.contextMenu.mouseClicked(event)) {
 			return true;
@@ -344,7 +362,7 @@ public class BlockList extends Component {
 			return true;
 		}
 		if (event.isEscape()) {
-			this.inputActive = false;
+			this.setInputActive(false);
 			return true;
 		}
 		return false;

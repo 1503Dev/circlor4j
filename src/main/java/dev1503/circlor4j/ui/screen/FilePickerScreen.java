@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
@@ -105,6 +106,33 @@ public class FilePickerScreen extends Screen {
 		return this.saveFieldY();
 	}
 
+	/**
+	 * Whether the file-name field owns raw key input right now. In that case module keybinds must
+	 * not fire, otherwise typing a bound letter (the default Y bind, for instance) would toggle
+	 * the ClickGUI underneath this dialog.
+	 */
+	public static boolean isInputFocused() {
+		if (Minecraft.getInstance().gui.screen() instanceof FilePickerScreen screen) {
+			return screen.filenameFocused;
+		}
+		return false;
+	}
+
+	/**
+	 * Focuses or unfocuses the file-name field. Minecraft only feeds {@link Screen#charTyped}
+	 * when SDL text input is running, and vanilla starts it from {@code EditBox#setFocused};
+	 * this field is hand-drawn, so it has to start/stop text input itself.
+	 */
+	private void setFilenameFocus(boolean focused) {
+		if (this.filenameFocused == focused) {
+			return;
+		}
+		this.filenameFocused = focused;
+		if (this.minecraft != null) {
+			this.minecraft.onTextInputFocusChange(this, focused);
+		}
+	}
+
 	private boolean inSaveField(int mx, int my) {
 		return mx >= this.saveFieldX() && mx < this.saveFieldX() + this.saveFieldW() && my >= this.saveFieldY() && my < this.saveFieldY() + SAVE_FIELD_H;
 	}
@@ -118,7 +146,7 @@ public class FilePickerScreen extends Screen {
 		int my = (int) event.y();
 
 		if (this.mode == Mode.SAVE && this.inSaveField(mx, my)) {
-			this.filenameFocused = true;
+			this.setFilenameFocus(true);
 			return true;
 		}
 		if (this.mode == Mode.SAVE && this.saveButton.mouseClicked(event)) {
@@ -134,12 +162,12 @@ public class FilePickerScreen extends Screen {
 				this.onClose();
 			} else {
 				this.filename = file.getFileName().toString().replace(".json", "");
-				this.filenameFocused = true;
+				this.setFilenameFocus(true);
 			}
 			return true;
 		}
 
-		this.filenameFocused = false;
+		this.setFilenameFocus(false);
 		return super.mouseClicked(event, doubleClick);
 	}
 
@@ -154,7 +182,7 @@ public class FilePickerScreen extends Screen {
 				return true;
 			}
 			if (event.isEscape()) {
-				this.filenameFocused = false;
+				this.setFilenameFocus(false);
 				return true;
 			}
 		}

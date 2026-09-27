@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
@@ -408,6 +409,17 @@ public class ClickGuiScreen extends Screen {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Whether the block-list add-id field is focused right now. While it is, raw key input belongs
+	 * to the field, so module keybinds must not fire (the default Y bind would close this screen).
+	 */
+	public static boolean isBlockListInputFocused() {
+		if (Minecraft.getInstance().gui.screen() instanceof ClickGuiScreen screen) {
+			return screen.activeBlockList != null && screen.activeBlockList.isInputActive();
+		}
+		return false;
 	}
 
 	private BlockList findOpenBlockList() {

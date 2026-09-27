@@ -72,9 +72,31 @@ public class AddKeyBindDialog extends Screen {
 		}
 	}
 
-	/** Whether the dialog is currently awaiting a key to capture (so keybinds don't fire). */
-	public static boolean isCapturing() {
-		return Minecraft.getInstance().gui.screen() instanceof AddKeyBindDialog dialog && dialog.capturing;
+	/**
+	 * Whether the dialog owns raw key input right now: either waiting for a key to capture or
+	 * with the function field focused. In both cases module keybinds must not fire, otherwise
+	 * typing a bound letter (the default Y bind, for instance) would open the ClickGUI.
+	 */
+	public static boolean isInputFocused() {
+		if (Minecraft.getInstance().gui.screen() instanceof AddKeyBindDialog dialog) {
+			return dialog.capturing || dialog.functionFocused;
+		}
+		return false;
+	}
+
+	/**
+	 * Focuses or unfocuses the function field. Minecraft only feeds {@link Screen#charTyped}
+	 * when SDL text input is running, and vanilla starts it from {@code EditBox#setFocused};
+	 * this dialog has no vanilla text widget, so it has to start/stop text input itself.
+	 */
+	private void setFunctionFocus(boolean focused) {
+		if (this.functionFocused == focused) {
+			return;
+		}
+		this.functionFocused = focused;
+		if (this.minecraft != null) {
+			this.minecraft.onTextInputFocusChange(this, focused);
+		}
 	}
 
 	@Override
@@ -152,19 +174,19 @@ public class AddKeyBindDialog extends Screen {
 
 		if (this.inCapture(mx, my)) {
 			this.capturing = true;
-			this.functionFocused = false;
+			this.setFunctionFocus(false);
 			this.modeDropdownOpen = false;
 			return true;
 		}
 		if (this.inFunction(mx, my)) {
 			this.capturing = false;
-			this.functionFocused = true;
+			this.setFunctionFocus(true);
 			this.modeDropdownOpen = false;
 			return true;
 		}
 		if (this.inMode(mx, my)) {
 			this.capturing = false;
-			this.functionFocused = false;
+			this.setFunctionFocus(false);
 			this.modeDropdownOpen = !this.modeDropdownOpen;
 			return true;
 		}
@@ -188,7 +210,7 @@ public class AddKeyBindDialog extends Screen {
 		if (this.cancelButton.mouseClicked(event)) {
 			return true;
 		}
-		this.functionFocused = false;
+		this.setFunctionFocus(false);
 		return super.mouseClicked(event, doubleClick);
 	}
 
@@ -215,7 +237,7 @@ public class AddKeyBindDialog extends Screen {
 				return true;
 			}
 			if (event.isEscape()) {
-				this.functionFocused = false;
+				this.setFunctionFocus(false);
 				return true;
 			}
 		}
